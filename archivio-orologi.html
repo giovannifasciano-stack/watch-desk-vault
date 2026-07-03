@@ -1,0 +1,1590 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Watch Desk Vault</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy-900:#0a1424; --navy-800:#0c1a2e; --navy-700:#0f2038;
+  --navy-600:#122742; --panel:#102341; --line:#1f3a5f; --line-soft:#18304e;
+  --gold:#c9a96a; --gold-bright:#d8bd82; --gold-deep:#a8854a;
+  --ink:#eaf0f8; --muted:#90a4c0; --muted-2:#6d83a3;
+  --pos:#46b98a; --neg:#e0726e; --warn:#d8a24a;
+  --shadow:0 18px 50px rgba(0,0,0,.45);
+  --r:14px; --r-sm:9px;
+  --serif:Georgia,"Hoefler Text","Times New Roman",serif;
+  --sans:'Outfit',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --mono:'DM Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  font-family:var(--sans);background:
+    radial-gradient(1200px 600px at 80% -10%,rgba(201,169,106,.06),transparent 60%),
+    radial-gradient(900px 500px at -10% 10%,rgba(35,70,120,.25),transparent 55%),
+    var(--navy-900);
+  color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.45;
+  padding-bottom:60px;
+}
+.wrap{max-width:1180px;margin:0 auto;padding:0 16px}
+
+/* Header */
+header{position:sticky;top:0;z-index:40;backdrop-filter:saturate(140%) blur(12px);
+  background:linear-gradient(180deg,rgba(10,20,36,.92),rgba(10,20,36,.78));
+  border-bottom:1px solid var(--line-soft);position:sticky}
+header::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(460px 140px at 20% -30%,rgba(201,169,106,.10),transparent 65%)}
+.bar{position:relative;display:flex;flex-direction:column;gap:12px;padding:13px 16px;max-width:1180px;margin:0 auto}
+.brand{display:flex;align-items:flex-end;gap:16px}
+.brand-id{display:flex;flex-direction:column}
+.wm-eyebrow{font-family:var(--sans);font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#9a8f72;
+  font-weight:600;display:flex;align-items:center;gap:9px;margin-bottom:10px}
+.wm-eyebrow .sep{color:#6f6852}
+.wm-eyebrow .ver{border:1px solid #5f5a46;border-radius:6px;padding:2px 7px;font-size:10.5px;letter-spacing:1px;color:#c9a96a}
+.brand h1{font-family:var(--sans);font-weight:800;font-size:32px;letter-spacing:-.3px;text-transform:uppercase;
+  margin:0;line-height:.95;white-space:nowrap}
+.wm-w{color:#f4f1e8}
+.wm-d{background:linear-gradient(180deg,#ecd49a,#c9a96a 72%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.wm-v{margin-left:.32em;background:linear-gradient(180deg,#daff74,#a4dc26 78%);-webkit-background-clip:text;background-clip:text;color:transparent}
+@media(max-width:560px){.brand h1{font-size:23px;white-space:normal}}
+.brand-summary{margin-left:auto;text-align:right;font-size:11.5px;color:var(--muted);line-height:1.45}
+.brand-summary b{color:var(--gold-bright);font-family:var(--mono);font-weight:500;font-size:13px}
+.brand-summary .lb{font-size:9.5px;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted-2)}
+@media(max-width:520px){.brand-summary{display:none}}
+.crest{width:38px;height:38px;border-radius:10px;flex:none;
+  background:linear-gradient(145deg,#16335a,#0c1d33);border:1px solid var(--gold-deep);
+  display:grid;place-items:center;box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+.crest svg{width:21px;height:21px}
+.tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.btn{font-family:var(--sans);font-size:13px;border:1px solid var(--line);background:var(--navy-700);
+  color:var(--ink);padding:8px 13px;border-radius:var(--r-sm);cursor:pointer;display:inline-flex;align-items:center;gap:7px;
+  transition:.16s;white-space:nowrap}
+.btn:hover{border-color:var(--gold-deep);background:var(--navy-600)}
+.btn svg{width:15px;height:15px;opacity:.85}
+.btn.gold{background:linear-gradient(145deg,var(--gold),var(--gold-deep));color:#1a1407;border-color:var(--gold-deep);font-weight:600}
+.btn.gold:hover{filter:brightness(1.07)}
+.btn.ghost{background:transparent}
+.lang{display:flex;border:1px solid var(--line);border-radius:var(--r-sm);overflow:hidden}
+.lang button{border:0;background:transparent;color:var(--muted);font-size:12px;font-weight:600;padding:7px 11px;cursor:pointer;letter-spacing:.5px}
+.lang button.on{background:var(--gold);color:#1a1407}
+
+/* Dashboard */
+.dash{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:22px 0 6px}
+.kpi{background:linear-gradient(160deg,var(--navy-700),var(--navy-800));border:1px solid var(--line-soft);
+  border-radius:var(--r);padding:15px 16px;position:relative;overflow:hidden}
+.kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(var(--gold),var(--gold-deep))}
+.kpi .lab{font-size:10.5px;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted)}
+.kpi .val{font-family:var(--serif);font-size:25px;margin-top:6px;font-weight:600;letter-spacing:.3px}
+.kpi .meta{font-size:11.5px;color:var(--muted-2);margin-top:3px}
+.kpi .val.pos{color:var(--pos)} .kpi .val.neg{color:var(--neg)}
+.kpi.span2{grid-column:span 2}
+
+.brkdown{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 18px}
+.chip{font-size:11.5px;color:var(--muted);background:var(--navy-700);border:1px solid var(--line-soft);
+  padding:5px 10px;border-radius:20px}
+.chip b{color:var(--ink);font-weight:600}
+
+/* View tabs */
+.viewtabs{display:inline-flex;gap:4px;background:var(--navy-700);border:1px solid var(--line-soft);
+  border-radius:11px;padding:4px;margin:20px 0 4px}
+.viewtabs button{border:0;background:transparent;color:var(--muted);font-family:var(--sans);font-size:13px;
+  font-weight:600;letter-spacing:.3px;padding:8px 18px;border-radius:8px;cursor:pointer;transition:.15s}
+.viewtabs button.on{background:linear-gradient(145deg,var(--gold),var(--gold-deep));color:#1a1407}
+
+/* Analytics */
+.an-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:14px 0 8px}
+.an-kpi{background:linear-gradient(160deg,var(--navy-700),var(--navy-800));border:1px solid var(--line-soft);
+  border-radius:var(--r);padding:14px 15px;position:relative;overflow:hidden}
+.an-kpi .lab{font-size:10px;letter-spacing:1.3px;text-transform:uppercase;color:var(--muted)}
+.an-kpi .val{font-family:var(--serif);font-size:23px;font-weight:600;margin-top:6px;letter-spacing:.3px;font-variant-numeric:tabular-nums}
+.an-kpi .sub{font-size:11px;color:var(--muted-2);margin-top:3px}
+.an-kpi .val.pos{color:var(--pos)} .an-kpi .val.neg{color:var(--neg)}
+.an-kpi.accent::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(var(--gold),var(--gold-deep))}
+.an-panels{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:6px}
+.an-card{background:linear-gradient(165deg,var(--navy-700),var(--navy-800));border:1px solid var(--line-soft);
+  border-radius:var(--r);padding:16px 17px}
+.an-card h3{font-family:var(--serif);font-size:15px;font-weight:600;margin:0 0 14px;display:flex;align-items:center;gap:8px}
+.an-card h3 .hint{font-size:11px;color:var(--muted-2);font-family:var(--sans);font-weight:400;margin-left:auto}
+.donut-wrap{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.legend-list{display:flex;flex-direction:column;gap:7px;flex:1;min-width:130px}
+.legend-item{display:flex;align-items:center;gap:8px;font-size:12.5px}
+.legend-item .sw{width:11px;height:11px;border-radius:3px;flex:none}
+.legend-item .nm{color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.legend-item .vv{margin-left:auto;color:var(--ink);font-variant-numeric:tabular-nums;font-weight:600}
+.hbar-row{display:grid;grid-template-columns:96px 1fr auto;gap:10px;align-items:center;margin-bottom:9px;font-size:12.5px}
+.hbar-row .hb-lab{color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hbar-track{height:9px;background:var(--navy-900);border-radius:6px;overflow:hidden}
+.hbar-fill{height:100%;border-radius:6px;background:linear-gradient(90deg,var(--gold-deep),var(--gold))}
+.hbar-row .hb-val{color:var(--ink);font-variant-numeric:tabular-nums;font-weight:600;min-width:64px;text-align:right}
+.mover{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line-soft);font-size:13px}
+.mover:last-child{border-bottom:0}
+.mover .mv-brand{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--gold)}
+.mover .mv-model{font-size:13px}
+.mover .mv-pl{margin-left:auto;font-variant-numeric:tabular-nums;font-weight:600}
+.mover .mv-pl.pos{color:var(--pos)} .mover .mv-pl.neg{color:var(--neg)}
+.an-empty{text-align:center;color:var(--muted-2);padding:50px 20px}
+@media (max-width:880px){.an-grid{grid-template-columns:1fr 1fr}.an-panels{grid-template-columns:1fr}}
+
+/* Toolbar */
+.toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:18px 0 14px}
+.search{flex:1;min-width:190px;position:relative}
+.search input{width:100%;background:var(--navy-700);border:1px solid var(--line);color:var(--ink);
+  padding:11px 12px 11px 38px;border-radius:var(--r-sm);font-size:14px;font-family:var(--sans)}
+.search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;opacity:.5}
+select{background:var(--navy-700);border:1px solid var(--line);color:var(--ink);padding:10px 12px;
+  border-radius:var(--r-sm);font-size:13px;font-family:var(--sans);cursor:pointer;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 6'><path d='M1 1l4 4 4-4' stroke='%2390a4c0' stroke-width='1.4' fill='none' stroke-linecap='round'/></svg>");
+  background-repeat:no-repeat;background-position:right 11px center;padding-right:30px}
+input,textarea{outline:none}
+input:focus,textarea:focus,select:focus{border-color:var(--gold-deep)}
+
+/* Inventory list */
+.count{font-size:12.5px;color:var(--muted);margin:2px 2px 12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px}
+.card{background:linear-gradient(165deg,var(--navy-700),var(--navy-800));border:1px solid var(--line-soft);
+  border-radius:var(--r);overflow:hidden;cursor:pointer;transition:.18s;display:flex;flex-direction:column}
+.card:hover{border-color:var(--gold-deep);transform:translateY(-2px);box-shadow:var(--shadow)}
+.thumb{aspect-ratio:4/3;background:#0a1626;position:relative;display:grid;place-items:center;overflow:hidden}
+.thumb .ph{color:var(--line)}.thumb .ph svg{width:54px;height:54px}
+.thumb-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#0a1626;z-index:1}
+.status-tag{position:absolute;top:9px;left:9px;z-index:2;font-size:10px;letter-spacing:.8px;text-transform:uppercase;
+  font-weight:600;padding:4px 9px;border-radius:20px;backdrop-filter:blur(4px)}
+.st-stock{background:rgba(70,185,138,.18);color:var(--pos);border:1px solid rgba(70,185,138,.4)}
+.st-reserved{background:rgba(216,162,74,.18);color:var(--warn);border:1px solid rgba(216,162,74,.4)}
+.st-sold{background:rgba(224,114,110,.16);color:var(--neg);border:1px solid rgba(224,114,110,.4)}
+.st-consignment{background:rgba(120,150,210,.16);color:#8fa9e0;border:1px solid rgba(120,150,210,.4)}
+.st-collection{background:rgba(201,169,106,.16);color:var(--gold-bright);border:1px solid rgba(201,169,106,.4)}
+.invno{position:absolute;top:9px;right:9px;z-index:2;font-size:10px;letter-spacing:.6px;color:var(--muted);
+  background:rgba(8,16,28,.6);padding:3px 8px;border-radius:20px;backdrop-filter:blur(4px)}
+.card-del{position:absolute;bottom:9px;right:9px;width:32px;height:32px;border-radius:9px;z-index:3;
+  border:1px solid var(--line);background:rgba(8,16,28,.62);backdrop-filter:blur(4px);color:var(--muted-2);
+  cursor:pointer;display:grid;place-items:center;transition:.15s;opacity:.85}
+.card:hover .card-del{opacity:1}
+.card-del:hover,.card-del:active{border-color:var(--neg);color:var(--neg);background:rgba(224,114,110,.18)}
+.card-del svg{width:16px;height:16px}
+.card-body{padding:13px 14px 15px}
+.card-body .brand-name{font-size:10.5px;letter-spacing:1.4px;text-transform:uppercase;color:var(--gold)}
+.card-body .model-name{font-family:var(--serif);font-size:17px;font-weight:600;margin:3px 0 2px;line-height:1.25}
+.card-body .ref{font-size:11.5px;color:var(--muted-2);font-variant-numeric:tabular-nums}
+.card-foot{display:flex;justify-content:space-between;align-items:flex-end;margin-top:11px;
+  padding-top:11px;border-top:1px solid var(--line-soft)}
+.card-foot .pl-lab{font-size:9.5px;letter-spacing:1px;text-transform:uppercase;color:var(--muted-2)}
+.card-foot .val{font-family:var(--serif);font-size:16px;font-weight:600;font-variant-numeric:tabular-nums}
+.card-foot .pl{font-size:12px;font-weight:600;font-variant-numeric:tabular-nums}
+.pl.pos{color:var(--pos)} .pl.neg{color:var(--neg)}
+
+.empty{text-align:center;padding:70px 20px;color:var(--muted-2)}
+.empty svg{width:54px;height:54px;opacity:.3;margin-bottom:14px}
+.empty h3{font-family:var(--serif);color:var(--muted);font-weight:600;margin:0 0 6px}
+
+/* Modal */
+.overlay{position:fixed;inset:0;background:rgba(5,10,18,.72);backdrop-filter:blur(5px);z-index:60;
+  display:none;align-items:flex-start;justify-content:center;padding:24px 14px;overflow-y:auto}
+.overlay.open{display:flex}
+.modal{background:linear-gradient(170deg,var(--navy-700),var(--navy-800));border:1px solid var(--line);
+  border-radius:18px;max-width:760px;width:100%;box-shadow:var(--shadow);margin:auto}
+.modal-head{display:flex;align-items:center;gap:12px;padding:18px 20px;border-bottom:1px solid var(--line-soft);
+  position:sticky;top:0;background:linear-gradient(180deg,var(--navy-700),rgba(15,32,56,.96));z-index:2;border-radius:18px 18px 0 0}
+.modal-head h2{font-family:var(--serif);font-size:19px;margin:0;font-weight:600;margin-right:auto}
+.icon-btn{width:34px;height:34px;border-radius:9px;border:1px solid var(--line);background:var(--navy-600);
+  color:var(--muted);cursor:pointer;display:grid;place-items:center;flex:none}
+.icon-btn:hover{border-color:var(--gold-deep);color:var(--ink)}
+.icon-btn svg{width:17px;height:17px}
+.modal-body{padding:8px 20px 20px}
+
+/* Form */
+.fieldset{margin-top:18px}
+.legend{font-size:10.5px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);
+  padding-bottom:8px;margin-bottom:13px;border-bottom:1px solid var(--line-soft);display:flex;align-items:center;gap:8px}
+.legend .n{width:20px;height:20px;border-radius:6px;background:var(--navy-600);border:1px solid var(--line);
+  display:grid;place-items:center;font-size:10px;color:var(--muted);font-family:var(--serif)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.row.three{grid-template-columns:1fr 1fr 1fr}
+.row.full{grid-template-columns:1fr}
+.field label{display:block;font-size:11px;letter-spacing:.4px;color:var(--muted);margin-bottom:5px;text-transform:uppercase}
+.field input,.field select,.field textarea{width:100%;background:var(--navy-800);border:1px solid var(--line-soft);
+  color:var(--ink);padding:10px 11px;border-radius:9px;font-size:14px;font-family:var(--sans)}
+.field textarea{resize:vertical;min-height:64px;line-height:1.5}
+.field .hint{font-size:10.5px;color:var(--muted-2);margin-top:4px}
+.input-prefix{position:relative}
+.input-prefix span{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--gold);font-size:13px;pointer-events:none}
+.input-prefix input{padding-left:30px}
+
+/* Brand combobox */
+.combo{position:relative}
+.combo > input{padding-right:32px}
+.combo-caret{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:10px;pointer-events:none}
+.combo-panel{position:absolute;left:0;right:0;top:calc(100% + 5px);z-index:20;background:var(--navy-700);
+  border:1px solid var(--line);border-radius:10px;max-height:248px;overflow-y:auto;
+  box-shadow:var(--shadow);display:none;-webkit-overflow-scrolling:touch}
+.combo-panel.open{display:block}
+.combo-item{padding:9px 13px;font-size:14px;cursor:pointer;border-bottom:1px solid var(--line-soft)}
+.combo-item:last-child{border-bottom:0}
+.combo-item:hover{background:var(--navy-600);color:var(--gold-bright)}
+.combo-item .mk{color:var(--gold)}
+.combo-item.top{font-weight:600}
+.combo-head{padding:8px 13px 5px;font-size:9.5px;letter-spacing:1.6px;text-transform:uppercase;
+  color:var(--gold-deep);border-bottom:1px solid var(--line-soft);background:var(--navy-800)}
+.combo-head.az{color:var(--muted-2)}
+.combo-panel.wide{right:auto;width:min(390px,calc(100vw - 56px))}
+.combo-item.ref{display:flex;gap:11px;align-items:baseline}
+.ref-no{font-variant-numeric:tabular-nums;color:var(--gold-bright);font-weight:600;font-size:13px;flex:none;min-width:96px}
+.ref-m{color:var(--muted);font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#ref-ai-btn:disabled{opacity:.7;cursor:default}
+.combo-empty{padding:11px 13px;font-size:12.5px;color:var(--muted-2);line-height:1.5}
+
+/* AI estimate result */
+.ai-result{display:none;margin-top:10px;background:var(--navy-800);border:1px solid var(--line-soft);
+  border-radius:11px;padding:12px 14px;font-size:13px;line-height:1.55}
+.ai-result.show{display:block}
+.ai-result.loading{color:var(--gold);display:block}
+.ai-result .est{font-family:var(--serif);font-size:18px;color:var(--gold-bright);font-weight:600}
+.ai-result .rng{color:var(--muted)}
+.ai-result .src{color:var(--muted-2);font-size:11.5px;margin-top:6px}
+.ai-result .src a{color:var(--muted);text-decoration:underline}
+.ai-result .applied{color:var(--pos);font-size:11.5px;margin-top:6px}
+.ai-result .err{color:var(--neg)}
+.spin{display:inline-block;width:13px;height:13px;border:2px solid var(--line);border-top-color:var(--gold);
+  border-radius:50%;animation:sp .7s linear infinite;vertical-align:-2px;margin-right:7px}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* Settings */
+.set-note{background:var(--navy-800);border:1px solid var(--line-soft);border-radius:10px;padding:11px 13px;
+  font-size:12px;color:var(--muted);line-height:1.55;margin-bottom:14px}
+.set-note b{color:var(--ink)}
+.sync-row{display:flex;gap:10px;align-items:center;margin-top:6px;flex-wrap:wrap}
+.sync-state{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:7px}
+.sync-state .d{width:9px;height:9px;border-radius:50%;background:var(--muted-2)}
+.sync-state .d.ok{background:var(--pos)} .sync-state .d.err{background:var(--neg)} .sync-state .d.busy{background:var(--gold)}
+
+/* Photos */
+.photos{display:flex;gap:10px;flex-wrap:wrap}
+.photo{width:84px;height:84px;border-radius:10px;background:#0a1626 center/cover no-repeat;
+  border:1px solid var(--line-soft);position:relative;flex:none}
+.photo .rm{position:absolute;top:-7px;right:-7px;width:22px;height:22px;border-radius:50%;background:var(--neg);
+  color:#fff;border:2px solid var(--navy-800);cursor:pointer;display:grid;place-items:center;font-size:13px;line-height:1}
+.add-photo{width:84px;height:84px;border-radius:10px;border:1.5px dashed var(--line);background:var(--navy-800);
+  display:grid;place-items:center;cursor:pointer;color:var(--muted-2)}
+.add-photo:hover{border-color:var(--gold-deep);color:var(--gold)}
+.add-photo svg{width:22px;height:22px}
+
+.modal-foot{display:flex;gap:10px;justify-content:space-between;align-items:center;padding:16px 20px;
+  border-top:1px solid var(--line-soft);position:sticky;bottom:0;background:linear-gradient(0deg,var(--navy-700),rgba(15,32,56,.96));border-radius:0 0 18px 18px}
+.modal-foot .right{display:flex;gap:10px}
+.btn.danger{border-color:rgba(224,114,110,.4);color:var(--neg)}
+.btn.danger:hover{background:rgba(224,114,110,.1)}
+
+/* Detail view */
+.detail-hero{display:grid;grid-template-columns:280px 1fr;gap:20px;margin-top:6px}
+.detail-gallery .main-ph{aspect-ratio:1;border-radius:12px;background:#0a1626;border:1px solid var(--line-soft);display:grid;place-items:center;position:relative;overflow:hidden}
+.detail-gallery .main-ph .ph svg{width:56px;height:56px;color:var(--line)}
+.detail-thumbs{display:flex;gap:7px;margin-top:8px;flex-wrap:wrap}
+.detail-thumbs .t{width:52px;height:52px;border-radius:8px;background:#0a1626 center/cover no-repeat;border:1px solid var(--line-soft);cursor:pointer}
+.detail-thumbs .t.sel{border-color:var(--gold)}
+.detail-meta .brand-name{font-size:11px;letter-spacing:1.6px;text-transform:uppercase;color:var(--gold)}
+.detail-meta h2.dm{font-family:var(--serif);font-size:24px;margin:4px 0 2px;font-weight:600}
+.detail-meta .ref{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.spec-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 22px;margin-top:16px}
+.spec{border-bottom:1px solid var(--line-soft);padding-bottom:7px}
+.spec .k{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted-2)}
+.spec .v{font-size:14px;margin-top:2px}
+.fin-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}
+.fin{background:var(--navy-800);border:1px solid var(--line-soft);border-radius:11px;padding:12px 14px}
+.fin .k{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted-2)}
+.fin .v{font-family:var(--serif);font-size:19px;font-weight:600;margin-top:4px;font-variant-numeric:tabular-nums}
+.detail-section{margin-top:20px}
+.detail-section .legend{margin-bottom:10px}
+.note-box{background:var(--navy-800);border:1px solid var(--line-soft);border-radius:11px;padding:13px 15px;font-size:13.5px;color:var(--muted);line-height:1.6;white-space:pre-wrap}
+
+input[type=file]{display:none}
+.hidden{display:none!important}
+
+/* In-app confirm dialog + toasts */
+.confirm-overlay{z-index:80;align-items:center}
+.confirm-box{background:linear-gradient(170deg,var(--navy-700),var(--navy-800));border:1px solid var(--line);
+  border-radius:16px;max-width:430px;width:100%;margin:auto;padding:22px 22px 18px;box-shadow:var(--shadow)}
+.confirm-msg{font-size:15px;line-height:1.55;margin-bottom:20px}
+.confirm-actions{display:flex;gap:10px;justify-content:flex-end}
+.confirm-actions .btn{padding:9px 16px}
+#toast-wrap{position:fixed;left:0;right:0;bottom:26px;z-index:95;display:flex;flex-direction:column;
+  align-items:center;gap:8px;pointer-events:none;padding:0 14px}
+.toast{background:var(--navy-600);border:1px solid var(--line);color:var(--ink);padding:11px 17px;border-radius:11px;
+  font-size:13.5px;line-height:1.4;box-shadow:var(--shadow);max-width:520px;opacity:0;transform:translateY(10px);
+  transition:.22s;pointer-events:auto}
+.toast.show{opacity:1;transform:none}
+.toast.ok{border-color:var(--pos)} .toast.err{border-color:var(--neg)}
+
+@media (max-width:880px){
+  .dash{grid-template-columns:1fr 1fr}
+  .detail-hero{grid-template-columns:1fr}
+  .detail-gallery{max-width:280px}
+}
+@media (max-width:520px){
+  .brand h1{font-size:18px}
+  .kpi .val{font-size:21px}
+  .row,.row.three{grid-template-columns:1fr}
+  .fin-strip{grid-template-columns:1fr}
+  .spec-grid{grid-template-columns:1fr}
+}
+
+/* Print */
+@media print{
+  @page{margin:14mm}
+  body{background:#fff;color:#111;padding:0}
+  header,.toolbar,.count,.dash .kpi::before,.add-photo,.modal-foot,.icon-btn,.no-print{display:none!important}
+  .wrap{max-width:none}
+  .dash{grid-template-columns:repeat(4,1fr);margin:0 0 14px}
+  .kpi{background:#fff;border:1px solid #ccc;color:#111}
+  .kpi .lab,.kpi .meta{color:#555}
+  .brkdown{display:none}
+  .grid{display:block}
+  .card{break-inside:avoid;border:1px solid #ccc;margin-bottom:8px;page-break-inside:avoid;
+    display:grid;grid-template-columns:90px 1fr auto;gap:12px;align-items:center;padding:8px;background:#fff;color:#111}
+  .thumb{aspect-ratio:1;width:80px;border-radius:6px}.card .status-tag,.card .invno{position:static}
+  .card-body{padding:0}.card-foot{border:0;margin:0;padding:0}
+  .overlay.open{position:static;display:block;background:#fff;padding:0}
+  .overlay.open .modal{box-shadow:none;border:0;background:#fff;color:#111;max-width:none}
+  .modal .modal-head{position:static;background:#fff;color:#111;border-bottom:2px solid #111}
+  .note-box,.fin,.spec,.field input{background:#fff;color:#111;border-color:#ccc}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <div class="brand">
+      <div class="brand-id">
+        <div class="wm-eyebrow" id="wm-eyebrow"></div>
+        <h1 id="t-title"><span class="wm-w">WATCH</span><span class="wm-d">DESK</span> <span class="wm-v">VAULT</span></h1>
+      </div>
+      <div class="brand-summary" id="brand-summary"></div>
+    </div>
+    <div class="tools">
+      <div class="lang">
+        <button id="lang-it" class="on" onclick="setLang('it')">IT</button>
+        <button id="lang-en" onclick="setLang('en')">EN</button>
+      </div>
+      <select id="currency" onchange="setCurrency(this.value)" title="Valuta">
+        <option value="€">🇪🇺 EUR €</option><option value="CHF ">🇨🇭 CHF</option>
+        <option value="$">🇺🇸 USD $</option><option value="£">🇬🇧 GBP £</option><option value="HK$">🇭🇰 HKD</option>
+      </select>
+      <button class="btn ghost" id="sync-btn" onclick="openSettings()" title="Sincronizzazione / Impostazioni">
+        <span id="sync-dot" style="width:8px;height:8px;border-radius:50%;background:var(--muted-2);flex:none"></span>
+        <svg viewBox="0 0 24 24" fill="none"><path d="M21 12a9 9 0 01-9 9 9 9 0 01-7.5-4M3 12a9 9 0 019-9 9 9 0 017.5 4M3 12V7m0 5h5m13 0v5m0-5h-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span id="t-sync">Sync</span></button>
+      <button class="btn ghost" onclick="exportJSON()" title="Backup"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span id="t-backup">Backup</span></button>
+      <button class="btn ghost" onclick="document.getElementById('import-file').click()" title="Import"><svg viewBox="0 0 24 24" fill="none"><path d="M12 15V3m0 12l-4-4m4 4l4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" transform="rotate(180 12 12)"/></svg><span id="t-import">Importa</span></button>
+      <input type="file" id="import-file" accept="application/json" onchange="importJSON(event)">
+      <button class="btn ghost" onclick="exportCSV()" title="Export CSV"><svg viewBox="0 0 24 24" fill="none"><path d="M4 4h11l5 5v11a0 0 0 010 0H4z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M8 13h8M8 17h8M8 9h3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span>CSV</span></button>
+      <button class="btn ghost" onclick="window.print()" title="Stampa"><svg viewBox="0 0 24 24" fill="none"><path d="M6 9V3h12v6M6 18H4a2 2 0 01-2-2v-4a2 2 0 012-2h16a2 2 0 012 2v4a2 2 0 01-2 2h-2M6 14h12v7H6z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button class="btn gold" onclick="openEditor()"><svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span id="t-new">Nuovo</span></button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="viewtabs" id="viewtabs">
+    <button id="tab-inv" class="on" onclick="setView('inventory')">Inventario</button>
+    <button id="tab-an" onclick="setView('analytics')">Analisi</button>
+  </div>
+  <div class="dash" id="dash"></div>
+  <div class="brkdown" id="brkdown"></div>
+
+  <div class="toolbar" id="toolbar">
+    <div class="search">
+      <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#90a4c0" stroke-width="1.6"/><path d="M20 20l-3.5-3.5" stroke="#90a4c0" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <input id="search" type="text" placeholder="Cerca marca, modello, referenza, seriale…" oninput="render()">
+    </div>
+    <select id="f-status" onchange="render()"></select>
+    <select id="f-brand" onchange="render()"></select>
+    <select id="sort" onchange="render()"></select>
+  </div>
+
+  <div class="count" id="count"></div>
+  <div class="grid" id="grid"></div>
+  <div id="analytics" class="hidden"></div>
+</div>
+
+<!-- Editor / Detail overlay -->
+<div class="overlay" id="overlay">
+  <div class="modal" id="modal"></div>
+</div>
+
+<!-- In-app confirm dialog (native confirm() is blocked in sandboxed frames) -->
+<div class="overlay confirm-overlay" id="confirm-overlay">
+  <div class="confirm-box">
+    <div class="confirm-msg" id="confirm-msg"></div>
+    <div class="confirm-actions">
+      <button class="btn ghost" id="confirm-no" onclick="closeConfirm(false)">Annulla</button>
+      <button class="btn gold" id="confirm-yes" onclick="closeConfirm(true)">Conferma</button>
+    </div>
+  </div>
+</div>
+<div id="toast-wrap"></div>
+
+<script>
+/* ============ STATE ============ */
+const LS_KEY='watch_archive_v1';
+let DATA=load();
+let LANG=localStorage.getItem('wa_lang')||'it';
+let CUR=localStorage.getItem('wa_cur')||'€';
+let editingId=null, formPhotos=[], detailPhotoIdx=0;
+
+function load(){try{const r=localStorage.getItem(LS_KEY);return r?JSON.parse(r):[]}catch(e){return[]}}
+function save(){try{localStorage.setItem(LS_KEY,JSON.stringify(DATA));scheduleGhPush();return true}
+  catch(e){toast(T().quota,'err');return false}}
+
+/* ============ IN-APP DIALOGS (native confirm/alert are blocked in sandboxes) ============ */
+let _confirmResolve=null;
+function uiConfirm(msg,opts){
+  opts=opts||{};
+  return new Promise(resolve=>{
+    _confirmResolve=resolve;
+    document.getElementById('confirm-msg').textContent=msg;
+    const yes=document.getElementById('confirm-yes'),no=document.getElementById('confirm-no');
+    yes.textContent=opts.yes||(LANG==='it'?'Conferma':'Confirm');
+    no.textContent=opts.no||T().cancel;
+    yes.className='btn '+(opts.danger?'danger':'gold');
+    document.getElementById('confirm-overlay').classList.add('open');
+  });
+}
+function closeConfirm(val){
+  document.getElementById('confirm-overlay').classList.remove('open');
+  const r=_confirmResolve;_confirmResolve=null;
+  if(r)r(val);
+}
+function toast(msg,type){
+  const wrap=document.getElementById('toast-wrap');if(!wrap)return;
+  const el=document.createElement('div');el.className='toast '+(type||'');el.textContent=msg;
+  wrap.appendChild(el);requestAnimationFrame(()=>el.classList.add('show'));
+  setTimeout(()=>{el.classList.remove('show');setTimeout(()=>el.remove(),260)},3400);
+}
+
+/* ============ I18N ============ */
+const I18N={
+ it:{title:"Watch Desk",new:"Nuovo",backup:"Backup",import:"Importa",
+   kStock:"Pezzi in stock",kCost:"Costo di carico",kValue:"Valore di mercato",kUnreal:"Plus/Minus latente",
+   kRealized:"Realizzato (venduti)",units:"pezzi",
+   stAll:"Tutti gli stati",stock:"In stock",reserved:"Riservato",sold:"Venduto",consignment:"Conto vendita",collection:"Collezione",
+   brAll:"Tutte le marche",
+   sortNew:"Più recenti",sortValue:"Valore ↓",sortPL:"Plus/Minus ↓",sortBrand:"Marca A-Z",
+   countN:n=>`${n} ${n===1?'pezzo':'pezzi'} in archivio`,
+   emptyT:"Archivio vuoto",emptyD:"Aggiungi il primo orologio per iniziare il tuo archivio.",
+   addFirst:"Aggiungi orologio",
+   plLab:"Plus/Minus",noResults:"Nessun risultato per i filtri attivi.",
+   // sections
+   sIdent:"Identificazione",sTech:"Specifiche tecniche",sSet:"Corredo & condizioni",
+   sAcq:"Acquisizione",sVal:"Valutazione",sStatus:"Stato & ubicazione",sSale:"Vendita",sService:"Service",sNotes:"Note & documenti",sPhotos:"Fotografie",
+   // fields
+   brand:"Marca",model:"Modello",reference:"Referenza",serial:"N. seriale",movement:"N. movimento",
+   caliber:"Calibro",caseMat:"Materiale cassa",caseSize:"Diametro",dial:"Quadrante",bracelet:"Bracciale / cinturino",yearProd:"Anno produzione",
+   setType:"Corredo",cond:"Condizione",cardDate:"Data garanzia",
+   setFull:"Full set",setPapers:"Solo documenti",setWatch:"Solo orologio",setNA:"—",
+   condNew:"Nuovo / mai indossato",condUnworn:"Come nuovo",condExc:"Eccellente",condGood:"Buono",condFair:"Discreto",
+   acqDate:"Data acquisto",acqPrice:"Prezzo acquisto",acqSource:"Fornitore / venditore",acqChannel:"Canale",
+   chPrivate:"Privato",chDealer:"Dealer",chAuction:"Asta",chRetail:"Retail / boutique",chTrade:"Permuta",
+   marketVal:"Valore di mercato",asking:"Prezzo richiesto",insurance:"Valore assicurato",valDate:"Data valutazione",
+   status:"Stato",location:"Ubicazione",invNo:"N. inventario",
+   saleDate:"Data vendita",salePrice:"Prezzo vendita",buyer:"Acquirente",
+   lastService:"Ultimo service",serviceNotes:"Note service",
+   notes:"Note",
+   invHint:"Lascia vuoto per assegnazione automatica",
+   addPhoto:"Aggiungi",
+   save:"Salva",cancel:"Annulla",delete:"Elimina",edit:"Modifica",close:"Chiudi",print:"Stampa scheda",
+   confirmDel:"Eliminare definitivamente questo pezzo dall'archivio?",
+   needBM:"Inserisci almeno Marca e Modello.",
+   quota:"Spazio di archiviazione esaurito. Esporta un backup e riduci il numero/peso delle foto.",
+   importOk:n=>`Importati ${n} pezzi.`,importErr:"File non valido.",importMode:"Importazione: sostituire l'archivio attuale o unire i dati?",
+   acquired:"Acquistato",cost:"Costo",mv:"Valore mercato",
+   sync:"Sync",aiEstimate:"Stima AI",
+   tabInv:"Inventario",tabAn:"Analisi",
+   refUpdate:"Referenze (AI)",refLoading:"Ricerca referenze…",
+   aiImage:"Immagine di riferimento caricata — sostituiscila con le tue foto del pezzo",
+   descLegend:"Descrizione per annuncio",descGen:"Genera AI",descLoading:"Generazione descrizione…",descCopy:"Copia",descCopied:"Descrizione copiata",
+   aiLoading:"Ricerca prezzi di mercato in corso…",
+   aiRange:"Range",aiSources:"Fonti",aiApplied:"Valore inserito nel campo — modificabile",
+   aiNeedBM:"Inserisci Marca e Modello prima di stimare.",
+   aiNoKey:"Stima AI non disponibile: configura il proxy Cloudflare o una chiave Anthropic nelle Impostazioni.",
+   aiErr:"Stima non riuscita. Riprova tra poco.",
+   setTitle:"Sincronizzazione & Impostazioni",
+   setGh:"Database su GitHub (repo privato)",
+   setGhNote:"I dati restano in locale e vengono sincronizzati su un <b>repo privato</b> GitHub che diventa il tuo archivio master, accessibile da ogni dispositivo e versionato. Usa un token <b>fine-grained</b> con permesso <b>Contents: Read &amp; Write</b> sul solo repo dell'archivio. Il token resta solo nel tuo browser.",
+   ghToken:"GitHub token",ghOwner:"Owner (utente/org)",ghRepo:"Repository",ghPath:"Percorso file",ghBranch:"Branch",
+   ghPull:"Carica da GitHub",ghPush:"Salva su GitHub",ghAuto:"Sincronizzazione automatica ad ogni modifica",
+   setAi:"Stima prezzo AI",
+   setProxyNote:"Metodo consigliato: incolla l'indirizzo del tuo <b>Cloudflare Worker</b>. La chiave Anthropic resta sul server, mai esposta nella pagina, e il prezzo si carica su tutti i dispositivi.",
+   proxyUrl:"URL del proxy (Cloudflare Worker)",
+   proxySecret:"Codice condiviso del proxy (opzionale)",
+   setImg:"Foto da repository GitHub",
+   setBrandName:"Nome della collezione",
+   setBrandNote:"Il sottotitolo mostrato nell'intestazione e nella fascia di rappresentanza. Es. <b>PRIVATE COLLECTION</b>, <b>PRIVATE INVENTORY</b>, oppure <b>FASCIANO PRIVATE COLLECTION</b>.",
+   collName:"Nome / sottotitolo",
+   setImgNote:"Carica le foto nel tuo repo (o in una cartella del sito) nominando ogni file con la <b>referenza</b> e estensione .jpg, es. <b>126610LN.jpg</b> (i caratteri non alfanumerici diventano <b>-</b>, quindi 5711/1A → 5711-1A.jpg). Indica qui il percorso o URL della cartella: l'app abbinerà l'immagine alla referenza, senza hotlink né dipendenze esterne. È il metodo più affidabile e le foto restano tue.",
+   imgBase:"Percorso/URL cartella immagini",
+   setAiNote:"Nell'anteprima Claude funziona senza chiave. Su <b>GitHub Pages</b> serve la tua chiave API Anthropic (resta nel browser; per la massima sicurezza usa un piccolo proxy invece di esporla).",
+   anthKey:"Anthropic API key",
+   stOk:"Sincronizzato",stBusy:"Sincronizzazione…",stErr:"Errore di sync",stOff:"Solo locale",stNever:"Mai sincronizzato",
+   ghPulled:n=>`Caricati ${n} pezzi da GitHub.`,ghPushed:"Salvato su GitHub.",
+   ghErrCfg:"Compila token, owner e repository.",ghErr:"Operazione GitHub non riuscita: ",
+   ghConfirmPull:"Sostituire l'archivio locale con quello su GitHub?"},
+ en:{title:"Watch Desk",new:"New",backup:"Backup",import:"Import",
+   kStock:"Pieces in stock",kCost:"Carrying cost",kValue:"Market value",kUnreal:"Unrealized P&L",
+   kRealized:"Realized (sold)",units:"pcs",
+   stAll:"All statuses",stock:"In stock",reserved:"Reserved",sold:"Sold",consignment:"Consignment",collection:"Collection",
+   brAll:"All brands",
+   sortNew:"Newest",sortValue:"Value ↓",sortPL:"P&L ↓",sortBrand:"Brand A-Z",
+   countN:n=>`${n} ${n===1?'piece':'pieces'} in archive`,
+   emptyT:"Empty archive",emptyD:"Add your first watch to start your archive.",
+   addFirst:"Add watch",
+   plLab:"P&L",noResults:"No results for the active filters.",
+   sIdent:"Identification",sTech:"Technical specs",sSet:"Set & condition",
+   sAcq:"Acquisition",sVal:"Valuation",sStatus:"Status & location",sSale:"Sale",sService:"Service",sNotes:"Notes & documents",sPhotos:"Photographs",
+   brand:"Brand",model:"Model",reference:"Reference",serial:"Serial no.",movement:"Movement no.",
+   caliber:"Caliber",caseMat:"Case material",caseSize:"Case size",dial:"Dial",bracelet:"Bracelet / strap",yearProd:"Year of production",
+   setType:"Set",cond:"Condition",cardDate:"Warranty date",
+   setFull:"Full set",setPapers:"Papers only",setWatch:"Watch only",setNA:"—",
+   condNew:"New / unworn",condUnworn:"Mint",condExc:"Excellent",condGood:"Good",condFair:"Fair",
+   acqDate:"Purchase date",acqPrice:"Purchase price",acqSource:"Source / seller",acqChannel:"Channel",
+   chPrivate:"Private",chDealer:"Dealer",chAuction:"Auction",chRetail:"Retail / boutique",chTrade:"Trade-in",
+   marketVal:"Market value",asking:"Asking price",insurance:"Insured value",valDate:"Valuation date",
+   status:"Status",location:"Location",invNo:"Inventory no.",
+   saleDate:"Sale date",salePrice:"Sale price",buyer:"Buyer",
+   lastService:"Last service",serviceNotes:"Service notes",
+   notes:"Notes",
+   invHint:"Leave empty for auto-assignment",
+   addPhoto:"Add",
+   save:"Save",cancel:"Cancel",delete:"Delete",edit:"Edit",close:"Close",print:"Print sheet",
+   confirmDel:"Permanently remove this piece from the archive?",
+   needBM:"Enter at least Brand and Model.",
+   quota:"Storage is full. Export a backup and reduce the number/size of photos.",
+   importOk:n=>`Imported ${n} pieces.`,importErr:"Invalid file.",importMode:"Import: replace the current archive or merge the data?",
+   acquired:"Acquired",cost:"Cost",mv:"Market value",
+   sync:"Sync",aiEstimate:"AI estimate",
+   tabInv:"Inventory",tabAn:"Analytics",
+   refUpdate:"References (AI)",refLoading:"Fetching references…",
+   aiImage:"Reference image loaded — replace it with your own photos of the piece",
+   descLegend:"Listing description",descGen:"Generate AI",descLoading:"Generating description…",descCopy:"Copy",descCopied:"Description copied",
+   aiLoading:"Researching market prices…",
+   aiRange:"Range",aiSources:"Sources",aiApplied:"Value placed in the field — editable",
+   aiNeedBM:"Enter Brand and Model before estimating.",
+   aiNoKey:"AI estimate unavailable: set up the Cloudflare proxy or an Anthropic key in Settings.",
+   aiErr:"Estimate failed. Try again shortly.",
+   setTitle:"Sync & Settings",
+   setGh:"Database on GitHub (private repo)",
+   setGhNote:"Data stays local and syncs to a <b>private</b> GitHub repo that becomes your master archive — available on every device and versioned. Use a <b>fine-grained</b> token with <b>Contents: Read &amp; Write</b> on the archive repo only. The token stays in your browser.",
+   ghToken:"GitHub token",ghOwner:"Owner (user/org)",ghRepo:"Repository",ghPath:"File path",ghBranch:"Branch",
+   ghPull:"Load from GitHub",ghPush:"Save to GitHub",ghAuto:"Auto-sync on every change",
+   setAi:"AI price estimate",
+   setProxyNote:"Recommended: paste your <b>Cloudflare Worker</b> address. The Anthropic key stays on the server, never exposed in the page, and prices load on every device.",
+   proxyUrl:"Proxy URL (Cloudflare Worker)",
+   proxySecret:"Proxy shared secret (optional)",
+   setImg:"Photos from GitHub repository",
+   setBrandName:"Collection name",
+   setBrandNote:"The subtitle shown in the header and hero banner. E.g. <b>PRIVATE COLLECTION</b>, <b>PRIVATE INVENTORY</b>, or <b>FASCIANO PRIVATE COLLECTION</b>.",
+   collName:"Name / subtitle",
+   setImgNote:"Upload photos to your repo (or a site folder), naming each file with the <b>reference</b> and a .jpg extension, e.g. <b>126610LN.jpg</b> (non-alphanumeric characters become <b>-</b>, so 5711/1A → 5711-1A.jpg). Enter the folder path or URL here: the app matches the image to the reference — no hotlinks, no external dependencies. It is the most reliable method and the photos stay yours.",
+   imgBase:"Image folder path/URL",
+   setAiNote:"In the Claude preview it works without a key. On <b>GitHub Pages</b> you need your Anthropic API key (kept in the browser; for best security use a small proxy instead of exposing it).",
+   anthKey:"Anthropic API key",
+   stOk:"Synced",stBusy:"Syncing…",stErr:"Sync error",stOff:"Local only",stNever:"Never synced",
+   ghPulled:n=>`Loaded ${n} pieces from GitHub.`,ghPushed:"Saved to GitHub.",
+   ghErrCfg:"Fill in token, owner and repository.",ghErr:"GitHub operation failed: ",
+   ghConfirmPull:"Replace the local archive with the one on GitHub?"}
+};
+function T(){return I18N[LANG]}
+
+/* ============ HELPERS ============ */
+function uid(){return 'w'+Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+function money(n){if(n===''||n==null||isNaN(n))return '—';
+  return CUR+Number(n).toLocaleString(LANG==='it'?'it-IT':'en-US',{maximumFractionDigits:0})}
+function nextInvNo(){
+  let max=0;DATA.forEach(w=>{const m=/INV-(\d+)/.exec(w.invNo||'');if(m)max=Math.max(max,+m[1])});
+  return 'INV-'+String(max+1).padStart(4,'0');
+}
+function statusClass(s){return 'st-'+s}
+function statusLabel(s){return T()[s]||s}
+function esc(s){return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+
+/* ============ IMAGES ============ */
+const WATCH_SVG=`<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round">
+<rect x="26" y="5" width="12" height="11" rx="2.5"/><rect x="26" y="48" width="12" height="11" rx="2.5"/>
+<circle cx="32" cy="32" r="17"/><circle cx="32" cy="32" r="12.5" stroke-opacity=".45"/>
+<path d="M32 24v8l5 3.2" stroke-linecap="round"/><path d="M49.5 29.5l3-1.2M49.5 34.5l3 1.2" stroke-linecap="round"/></svg>`;
+let IMG_BASE=localStorage.getItem('wa_imgbase')||'';
+let COLL_NAME=localStorage.getItem('wa_collname')||'INVENTORY';
+const CREST_SVG=`<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="13" r="7.2" stroke="#c9a96a" stroke-width="1.3"/><path d="M12 9.2v3.8l2.6 1.6" stroke="#c9a96a" stroke-width="1.3" stroke-linecap="round"/><path d="M9.3 4.2h5.4M10 4.2l-.5 2.2M14 4.2l.5 2.2" stroke="#c9a96a" stroke-width="1.3" stroke-linecap="round"/></svg>`;
+function saniRef(r){return (r||'').trim().replace(/[^A-Za-z0-9]+/g,'-').replace(/^-+|-+$/g,'')}
+function repoImg(w){if(!IMG_BASE||!w.reference)return '';return IMG_BASE.replace(/\/+$/,'')+'/'+saniRef(w.reference)+'.jpg'}
+// Returns a placeholder layer plus an <img> on top; if the img fails it removes itself and the placeholder shows.
+function photoLayer(w,big){
+  const cand=(w.photos&&w.photos[0])||repoImg(w);
+  return `<div class="ph">${WATCH_SVG}</div>`+
+    (cand?`<img class="thumb-img" src="${esc(cand)}" alt="" referrerpolicy="no-referrer" onerror="this.remove()">`:'');
+}
+
+/* ============ DASHBOARD ============ */
+function computeStats(){
+  let stockCount=0,cost=0,value=0,realized=0;
+  DATA.forEach(w=>{
+    const ac=+w.acqPrice||0, mv=+w.marketValue||0;
+    if(w.status==='sold'){ realized+=(+w.salePrice||0)-ac; }
+    else { stockCount++; cost+=ac; value+= (mv||ac); }
+  });
+  return {stockCount,cost,value,unreal:value-cost,realized};
+}
+function renderDash(){
+  const s=computeStats(),t=T();
+  const plc=s.unreal>=0?'pos':'neg', rlc=s.realized>=0?'pos':'neg';
+  const sign=n=>(n>=0?'+':'−')+money(Math.abs(n)).replace(CUR,CUR);
+  document.getElementById('dash').innerHTML=`
+    <div class="kpi"><div class="lab">${t.kStock}</div><div class="val">${s.stockCount}</div><div class="meta">${t.units}</div></div>
+    <div class="kpi"><div class="lab">${t.kCost}</div><div class="val">${money(s.cost)}</div></div>
+    <div class="kpi"><div class="lab">${t.kValue}</div><div class="val">${money(s.value)}</div></div>
+    <div class="kpi"><div class="lab">${t.kUnreal}</div><div class="val ${plc}">${sign(s.unreal)}</div>
+      <div class="meta ${rlc}">${t.kRealized}: ${sign(s.realized)}</div></div>`;
+  // brand breakdown
+  const byBrand={};DATA.filter(w=>w.status!=='sold').forEach(w=>{const b=w.brand||'—';byBrand[b]=(byBrand[b]||0)+1});
+  const chips=Object.entries(byBrand).sort((a,b)=>b[1]-a[1]).slice(0,8)
+    .map(([b,n])=>`<span class="chip">${esc(b)} <b>${n}</b></span>`).join('');
+  document.getElementById('brkdown').innerHTML=chips;
+}
+
+/* ============ FILTERS UI ============ */
+function fillFilters(){
+  const t=T();
+  document.getElementById('f-status').innerHTML=
+    `<option value="">${t.stAll}</option>`+
+    ['stock','reserved','sold','consignment','collection'].map(s=>`<option value="${s}">${t[s]}</option>`).join('');
+  const brands=[...new Set(DATA.map(w=>w.brand).filter(Boolean))].sort();
+  document.getElementById('f-brand').innerHTML=
+    `<option value="">${t.brAll}</option>`+brands.map(b=>`<option value="${esc(b)}">${esc(b)}</option>`).join('');
+  document.getElementById('sort').innerHTML=
+    [['new',t.sortNew],['value',t.sortValue],['pl',t.sortPL],['brand',t.sortBrand]]
+    .map(([v,l])=>`<option value="${v}">${l}</option>`).join('');
+}
+
+/* ============ LIST ============ */
+function render(){
+  renderHero();
+  renderDash();
+  const t=T();
+  const q=(document.getElementById('search').value||'').toLowerCase().trim();
+  const fs=document.getElementById('f-status').value;
+  const fb=document.getElementById('f-brand').value;
+  const sort=document.getElementById('sort').value;
+  let list=DATA.filter(w=>{
+    if(fs&&w.status!==fs)return false;
+    if(fb&&w.brand!==fb)return false;
+    if(q){const hay=[w.brand,w.model,w.reference,w.serial,w.movementNo,w.invNo,w.notes,w.acqSource].join(' ').toLowerCase();
+      if(!hay.includes(q))return false;}
+    return true;
+  });
+  const plOf=w=>((+w.marketValue||+w.acqPrice||0)-(+w.acqPrice||0));
+  list.sort((a,b)=>{
+    if(sort==='value')return (+b.marketValue||+b.acqPrice||0)-(+a.marketValue||+a.acqPrice||0);
+    if(sort==='pl')return plOf(b)-plOf(a);
+    if(sort==='brand')return (a.brand||'').localeCompare(b.brand||'');
+    return (b.createdAt||0)-(a.createdAt||0);
+  });
+
+  document.getElementById('count').textContent= DATA.length?t.countN(list.length):'';
+  const grid=document.getElementById('grid');
+
+  if(!DATA.length){
+    grid.innerHTML=`<div class="empty" style="grid-column:1/-1">
+      <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="13" r="7.5" stroke="currentColor" stroke-width="1.3"/><path d="M12 9v4l2.5 1.6M9.5 4h5M10 4l-.4 2M14 4l.4 2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      <h3>${t.emptyT}</h3><p>${t.emptyD}</p>
+      <button class="btn gold" style="margin-top:14px" onclick="openEditor()">${t.addFirst}</button></div>`;
+    return;
+  }
+  if(!list.length){grid.innerHTML=`<div class="empty" style="grid-column:1/-1"><p>${t.noResults}</p></div>`;return;}
+
+  grid.innerHTML=list.map(w=>{
+    const pl=plOf(w), mv=(+w.marketValue||+w.acqPrice||0);
+    const plc=pl>=0?'pos':'neg';
+    return `<div class="card" onclick="openDetail('${w.id}')">
+      <div class="thumb">
+        ${photoLayer(w)}
+        <span class="status-tag ${statusClass(w.status)}">${statusLabel(w.status)}</span>
+        <span class="invno">${esc(w.invNo||'')}</span>
+        <button class="card-del no-print" title="${t.delete}" aria-label="${t.delete}" onclick="event.stopPropagation();deleteWatch('${w.id}')">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M5 7h14M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2m-7 0v11a1 1 0 001 1h6a1 1 0 001-1V7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 11v6M14 11v6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div class="card-body">
+        <div class="brand-name">${esc(w.brand||'—')}</div>
+        <div class="model-name">${esc(w.model||'—')}</div>
+        <div class="ref">${esc(w.reference||'')}${w.yearProd?' · '+esc(w.yearProd):''}</div>
+        <div class="card-foot">
+          <div><div class="pl-lab">${t.mv}</div><div class="val">${money(mv)}</div></div>
+          <div style="text-align:right"><div class="pl-lab">${t.plLab}</div>
+            <div class="pl ${plc}">${pl>=0?'+':'−'}${money(Math.abs(pl)).replace(CUR,CUR)}</div></div>
+        </div>
+      </div></div>`;
+  }).join('');
+}
+
+function renderHero(){
+  const el=document.getElementById('brand-summary');if(!el)return;
+  const it=LANG==='it';
+  const nonSold=DATA.filter(w=>w.status!=='sold');
+  const value=nonSold.reduce((s,w)=>s+(+w.marketValue||+w.acqPrice||0),0);
+  if(!nonSold.length){el.innerHTML='';return}
+  el.innerHTML=`<div class="lb">${it?'Valutazione':'Valuation'}</div><b>${money(value)}</b>
+    <span style="color:var(--muted-2)"> · ${nonSold.length} ${it?'pezzi':'pieces'}</span>`;
+}
+
+/* ============ ANALYTICS ============ */
+let VIEW='inventory';
+const PALETTE=['#c9a96a','#4f7fb8','#46b98a','#d8894a','#9a6cc0','#d86e6e','#5bb0c9','#7d8fb3'];
+function setView(v){
+  VIEW=v;
+  document.getElementById('tab-inv').classList.toggle('on',v==='inventory');
+  document.getElementById('tab-an').classList.toggle('on',v==='analytics');
+  const inv=v==='inventory';
+  ['toolbar','count','grid','dash','brkdown'].forEach(id=>document.getElementById(id).classList.toggle('hidden',!inv));
+  document.getElementById('analytics').classList.toggle('hidden',inv);
+  if(inv)render();else renderAnalytics();
+}
+function refresh(){if(VIEW==='analytics')renderAnalytics();else render()}
+function daysInStock(w){
+  const s=w.acqDate?new Date(w.acqDate):(w.createdAt?new Date(w.createdAt):null);
+  if(!s||isNaN(s.getTime()))return null;
+  return Math.max(0,Math.floor((Date.now()-s.getTime())/86400000));
+}
+function pct(n){return (n>=0?'+':'−')+Math.abs(n).toFixed(1)+'%'}
+function donut(segs,size){
+  const nz=segs.filter(s=>s.value>0);const total=nz.reduce((s,x)=>s+x.value,0);
+  const r=size/2,cx=r,cy=r,rad=r-4,inner=rad*0.6;
+  if(!total)return `<svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}"><circle cx="${cx}" cy="${cy}" r="${(rad+inner)/2}" fill="none" stroke="var(--line-soft)" stroke-width="${rad-inner}"/></svg>`;
+  if(nz.length===1)return `<svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}"><circle cx="${cx}" cy="${cy}" r="${(rad+inner)/2}" fill="none" stroke="${nz[0].color}" stroke-width="${rad-inner}"/></svg>`;
+  let ang=-Math.PI/2,paths='';
+  nz.forEach(s=>{
+    const frac=s.value/total,a2=ang+frac*Math.PI*2,large=frac>0.5?1:0;
+    const x1=cx+rad*Math.cos(ang),y1=cy+rad*Math.sin(ang),x2=cx+rad*Math.cos(a2),y2=cy+rad*Math.sin(a2);
+    const xi2=cx+inner*Math.cos(a2),yi2=cy+inner*Math.sin(a2),xi1=cx+inner*Math.cos(ang),yi1=cy+inner*Math.sin(ang);
+    paths+=`<path d="M${x1.toFixed(2)} ${y1.toFixed(2)} A${rad} ${rad} 0 ${large} 1 ${x2.toFixed(2)} ${y2.toFixed(2)} L${xi2.toFixed(2)} ${yi2.toFixed(2)} A${inner} ${inner} 0 ${large} 0 ${xi1.toFixed(2)} ${yi1.toFixed(2)} Z" fill="${s.color}"/>`;
+    ang=a2;
+  });
+  return `<svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">${paths}</svg>`;
+}
+function renderAnalytics(){
+  const it=LANG==='it';const box=document.getElementById('analytics');
+  if(!DATA.length){box.innerHTML=`<div class="an-empty">${it?'Aggiungi orologi per vedere le analisi del portafoglio.':'Add watches to see portfolio analytics.'}</div>`;return}
+  const nonSold=DATA.filter(w=>w.status!=='sold');
+  const sold=DATA.filter(w=>w.status==='sold');
+  const invested=nonSold.reduce((s,w)=>s+(+w.acqPrice||0),0);
+  const value=nonSold.reduce((s,w)=>s+(+w.marketValue||+w.acqPrice||0),0);
+  const unreal=value-invested, unrealPct=invested?unreal/invested*100:0;
+  const realized=sold.reduce((s,w)=>s+((+w.salePrice||0)-(+w.acqPrice||0)),0);
+  const marginArr=sold.filter(w=>+w.acqPrice>0).map(w=>((+w.salePrice||0)-(+w.acqPrice))/(+w.acqPrice)*100);
+  const avgMargin=marginArr.length?marginArr.reduce((a,b)=>a+b,0)/marginArr.length:0;
+  const sellThrough=(sold.length+nonSold.length)?sold.length/(sold.length+nonSold.length)*100:0;
+  const ages=nonSold.map(daysInStock).filter(x=>x!=null);
+  const avgAge=ages.length?Math.round(ages.reduce((a,b)=>a+b,0)/ages.length):0;
+  const sign=n=>(n>=0?'+':'−')+money(Math.abs(n)).replace(CUR,CUR);
+  const kpi=(lab,val,cls,sub,accent)=>`<div class="an-kpi${accent?' accent':''}"><div class="lab">${lab}</div><div class="val ${cls||''}">${val}</div>${sub?`<div class="sub">${sub}</div>`:''}</div>`;
+
+  // allocation by brand (value, nonSold)
+  const byBrand={};nonSold.forEach(w=>{const b=w.brand||'—';byBrand[b]=(byBrand[b]||0)+(+w.marketValue||+w.acqPrice||0)});
+  let brandArr=Object.entries(byBrand).sort((a,b)=>b[1]-a[1]);
+  let segs=[];const topB=brandArr.slice(0,7);const restB=brandArr.slice(7);
+  topB.forEach(([b,v],i)=>segs.push({label:b,value:v,color:PALETTE[i%PALETTE.length]}));
+  if(restB.length){segs.push({label:it?'Altri':'Others',value:restB.reduce((s,x)=>s+x[1],0),color:'#55617a'})}
+  const totVal=segs.reduce((s,x)=>s+x.value,0)||1;
+  const legend=segs.map(s=>`<div class="legend-item"><span class="sw" style="background:${s.color}"></span>
+    <span class="nm">${esc(s.label)}</span><span class="vv">${Math.round(s.value/totVal*100)}%</span></div>`).join('');
+
+  // value by status
+  const statuses=['stock','reserved','consignment','collection'];
+  const byStatus=statuses.map(st=>({st,v:nonSold.filter(w=>w.status===st).reduce((s,w)=>s+(+w.marketValue||+w.acqPrice||0),0),
+    n:nonSold.filter(w=>w.status===st).length})).filter(x=>x.n>0);
+  const maxStatus=Math.max(1,...byStatus.map(x=>x.v));
+  const statusBars=byStatus.map(x=>`<div class="hbar-row"><div class="hb-lab">${statusLabel(x.st)} · ${x.n}</div>
+    <div class="hbar-track"><div class="hbar-fill" style="width:${Math.max(3,x.v/maxStatus*100)}%"></div></div>
+    <div class="hb-val">${money(x.v)}</div></div>`).join('')||`<div class="sub" style="color:var(--muted-2)">—</div>`;
+
+  // aging buckets
+  const buckets=[['0–90',0,90],['91–180',91,180],['181–365',181,365],[it?'>1 anno':'>1 year',366,1e9]];
+  const bucketData=buckets.map(([lab,lo,hi])=>{const arr=nonSold.filter(w=>{const d=daysInStock(w);return d!=null&&d>=lo&&d<=hi});
+    return{lab,n:arr.length,v:arr.reduce((s,w)=>s+(+w.marketValue||+w.acqPrice||0),0)}});
+  const maxBucket=Math.max(1,...bucketData.map(x=>x.v));
+  const agingBars=bucketData.map(x=>`<div class="hbar-row"><div class="hb-lab">${x.lab} gg · ${x.n}</div>
+    <div class="hbar-track"><div class="hbar-fill" style="width:${x.v?Math.max(3,x.v/maxBucket*100):0}%"></div></div>
+    <div class="hb-val">${money(x.v)}</div></div>`).join('');
+
+  // top movers by unrealized P&L
+  const movers=nonSold.map(w=>({w,pl:(+w.marketValue||+w.acqPrice||0)-(+w.acqPrice||0)}))
+    .sort((a,b)=>b.pl-a.pl).slice(0,5);
+  const moversHtml=movers.map(({w,pl})=>`<div class="mover"><div>
+    <div class="mv-brand">${esc(w.brand||'—')}</div><div class="mv-model">${esc(w.model||'—')} <span style="color:var(--muted-2)">${esc(w.reference||'')}</span></div>
+    </div><div class="mv-pl ${pl>=0?'pos':'neg'}">${pl>=0?'+':'−'}${money(Math.abs(pl)).replace(CUR,CUR)}</div></div>`).join('')||`<div class="sub" style="color:var(--muted-2)">—</div>`;
+
+  box.innerHTML=`
+    <div class="an-grid">
+      ${kpi(it?'Valore portafoglio':'Portfolio value',money(value),'',null,true)}
+      ${kpi(it?'Capitale investito':'Capital invested',money(invested),'',null,true)}
+      ${kpi(it?'P&L latente':'Unrealized P&L',sign(unreal),unreal>=0?'pos':'neg',pct(unrealPct),true)}
+      ${kpi(it?'P&L realizzato':'Realized P&L',sign(realized),realized>=0?'pos':'neg',(it?'su ':'on ')+sold.length+(it?' venduti':' sold'),true)}
+      ${kpi(it?'Margine medio':'Avg margin',(avgMargin>=0?'+':'−')+Math.abs(avgMargin).toFixed(1)+'%',avgMargin>=0?'pos':'neg',it?'sui venduti':'on sold')}
+      ${kpi('Sell-through',sellThrough.toFixed(0)+'%',null,sold.length+' / '+(sold.length+nonSold.length))}
+      ${kpi(it?'Giacenza media':'Avg holding',avgAge+' gg',null,it?'pezzi in stock':'in-stock pieces')}
+      ${kpi(it?'Pezzi in stock':'In-stock pieces',String(nonSold.length),null,DATA.length+(it?' totali':' total'))}
+    </div>
+    <div class="an-panels">
+      <div class="an-card"><h3>${it?'Allocazione per marca':'Allocation by brand'}<span class="hint">${it?'valore':'value'}</span></h3>
+        <div class="donut-wrap">${donut(segs,150)}<div class="legend-list">${legend}</div></div></div>
+      <div class="an-card"><h3>${it?'Valore per stato':'Value by status'}</h3>${statusBars}</div>
+      <div class="an-card"><h3>${it?'Invecchiamento giacenza':'Inventory aging'}<span class="hint">${it?'giorni in stock':'days in stock'}</span></h3>${agingBars}</div>
+      <div class="an-card"><h3>${it?'Migliori performance':'Top movers'}<span class="hint">P&L ${it?'latente':'unrealized'}</span></h3>${moversHtml}</div>
+    </div>`;
+}
+const BRANDS=["A. Lange & Söhne","Alpina","Angelus","Armin Strom","Arnold & Son","Audemars Piguet",
+"Baume & Mercier","Bell & Ross","Blancpain","Bovet","Breguet","Breitling","Bremont","Bulgari",
+"Cartier","Chopard","Chronoswiss","Corum","Cvstos","Czapek","De Bethune","Doxa","Eberhard & Co.",
+"F.P. Journe","Fabergé","Ferdinand Berthoud","Franck Muller","Frederique Constant","Girard-Perregaux",
+"Glashütte Original","Grand Seiko","Greubel Forsey","H. Moser & Cie","Hamilton","Harry Winston","Hautlence",
+"Hermès","Hublot","HYT","IWC","Jacob & Co.","Jaeger-LeCoultre","Jaquet Droz","Junghans","Kari Voutilainen",
+"Laurent Ferrier","Longines","Louis Moinet","Louis Vuitton","MB&F","Maurice Lacroix","Mido","Montblanc","Movado",
+"Nomos Glashütte","Omega","Oris","Panerai","Parmigiani Fleurier","Patek Philippe","Perrelet","Piaget",
+"Rado","Raymond Weil","Richard Mille","Roger Dubuis","Rolex","Seiko","Sinn","Speake-Marin","TAG Heuer","Tissot",
+"Tudor","Ulysse Nardin","Urban Jürgensen","Urwerk","Vacheron Constantin","Van Cleef & Arpels","Zenith"];
+let _brandItems=[];
+let _lastBrandVal='';
+const TOP_BRANDS=["Rolex","Patek Philippe","Audemars Piguet","Richard Mille","A. Lange & Söhne",
+"Vacheron Constantin","Omega","Cartier","Tudor","Jaeger-LeCoultre"];
+function allBrands(){
+  const used=DATA.map(w=>w.brand).filter(Boolean);
+  return [...new Set([...BRANDS,...used])].sort((a,b)=>a.localeCompare(b,undefined,{sensitivity:'base'}));
+}
+function brandCombo(value){
+  const ph=LANG==='it'?'Cerca o digita la marca…':'Search or type brand…';
+  return `<div class="field"><label>${T().brand}</label>
+    <div class="combo">
+      <input id="f-brand-input" type="text" autocomplete="off" value="${esc(value||'')}" placeholder="${ph}"
+        oninput="openBrandList()" onfocus="openBrandList()"
+        onblur="setTimeout(closeBrandList,140)"
+        onkeydown="if(event.key==='Enter'){event.preventDefault();closeBrandList()}if(event.key==='Escape'){closeBrandList()}">
+      <div class="combo-caret">▼</div>
+      <div class="combo-panel" id="brand-panel"></div>
+    </div></div>`;
+}
+function openBrandList(){
+  const inp=document.getElementById('f-brand-input');if(!inp)return;
+  if(inp.value!==_lastBrandVal){_lastBrandVal=inp.value;resetReferenceContext();}
+  const q=inp.value.toLowerCase().trim();
+  const all=allBrands();
+  const isTop=b=>TOP_BRANDS.some(t=>t.toLowerCase()===b.toLowerCase());
+  const tops=TOP_BRANDS.filter(t=>all.some(x=>x.toLowerCase()===t.toLowerCase()));
+  const rest=all.filter(b=>!isTop(b));
+  const ordered=[...tops,...rest];
+  _brandItems=ordered.filter(b=>!q||b.toLowerCase().includes(q));
+  const panel=document.getElementById('brand-panel');
+  if(!_brandItems.length){
+    panel.innerHTML=`<div class="combo-empty">${LANG==='it'?'Nessuna marca in elenco — verrà usato il testo digitato':'No brand in list — your typed text will be used'}</div>`;
+    panel.classList.add('open');return;
+  }
+  let html='';
+  _brandItems.forEach((b,i)=>{
+    if(!q){
+      if(i===0)html+=`<div class="combo-head">${LANG==='it'?'★ Principali':'★ Top brands'}</div>`;
+      if(i===tops.length)html+=`<div class="combo-head az">A–Z</div>`;
+    }
+    let label=esc(b);
+    if(q){const idx=b.toLowerCase().indexOf(q);if(idx>=0)label=esc(b.slice(0,idx))+'<span class="mk">'+esc(b.slice(idx,idx+q.length))+'</span>'+esc(b.slice(idx+q.length))}
+    html+=`<div class="combo-item${!q&&isTop(b)?' top':''}" onmousedown="pickBrand(${i})">${label}</div>`;
+  });
+  panel.innerHTML=html;
+  panel.classList.add('open');
+}
+function pickBrand(i){
+  const inp=document.getElementById('f-brand-input');
+  if(inp&&_brandItems[i]!=null){
+    const nb=_brandItems[i];inp.value=nb;
+    if(nb!==_lastBrandVal){_lastBrandVal=nb;resetReferenceContext();}
+  }
+  closeBrandList();
+}
+function resetReferenceContext(){
+  // when the brand changes, wipe the previous brand's reference, its dropdown and the price result
+  const ri=document.getElementById('f-reference');if(ri)ri.value='';
+  const rp=document.getElementById('ref-panel');if(rp){rp.innerHTML='';rp.classList.remove('open')}
+  _refItems=[];
+  const ai=document.getElementById('ai-result');if(ai){ai.className='ai-result';ai.innerHTML=''}
+}
+function closeBrandList(){const p=document.getElementById('brand-panel');if(p)p.classList.remove('open')}
+
+/* ============ REFERENCE DATABASE (top 5 brands) ============ */
+const REFERENCES={
+"Rolex":[
+{r:"126610LN",m:"Submariner Date"},{r:"126610LV",m:"Submariner Date · Starbucks"},{r:"124060",m:"Submariner No-Date"},
+{r:"116610LN",m:"Submariner Date · prev. gen."},{r:"126500LN",m:"Cosmograph Daytona"},{r:"116500LN",m:"Cosmograph Daytona · prev."},
+{r:"126710BLRO",m:"GMT-Master II · Pepsi"},{r:"126710BLNR",m:"GMT-Master II · Batman"},{r:"126711CHNR",m:"GMT-Master II · Root Beer"},
+{r:"126720VTNR",m:"GMT-Master II · Destro"},{r:"124300",m:"Oyster Perpetual 41"},{r:"126000",m:"Oyster Perpetual 36"},
+{r:"126334",m:"Datejust 41 · fluted"},{r:"126300",m:"Datejust 41 · smooth"},{r:"126234",m:"Datejust 36"},{r:"126200",m:"Datejust 36 · smooth"},
+{r:"228238",m:"Day-Date 40 · yellow gold"},{r:"228239",m:"Day-Date 40 · white gold"},{r:"128238",m:"Day-Date 36"},
+{r:"226570",m:"Explorer II"},{r:"124270",m:"Explorer 36"},{r:"224270",m:"Explorer 40"},
+{r:"126600",m:"Sea-Dweller 43"},{r:"126660",m:"Deepsea"},{r:"136660",m:"Deepsea · 2024"},
+{r:"126622",m:"Yacht-Master 40"},{r:"226659",m:"Yacht-Master 42 · white gold"},
+{r:"326934",m:"Sky-Dweller"},{r:"336934",m:"Sky-Dweller · 2023"},{r:"126900",m:"Air-King"}],
+"Patek Philippe":[
+{r:"5811/1G-001",m:"Nautilus · white gold"},{r:"5711/1A-010",m:"Nautilus · steel blue (disc.)"},{r:"5711/1A-014",m:"Nautilus · olive green (disc.)"},
+{r:"5712/1A",m:"Nautilus Moonphase"},{r:"5726/1A",m:"Nautilus Annual Calendar"},{r:"5990/1A",m:"Nautilus Travel Time Chrono"},
+{r:"7118/1A",m:"Nautilus 35.2"},{r:"5740/1G",m:"Nautilus Perpetual Calendar"},
+{r:"5167A",m:"Aquanaut"},{r:"5168G",m:"Aquanaut 42 · white gold"},{r:"5164A",m:"Aquanaut Travel Time"},{r:"5267/200A",m:"Aquanaut Luce"},
+{r:"5196",m:"Calatrava 37"},{r:"5226G",m:"Calatrava 40"},{r:"5227",m:"Calatrava 39"},{r:"6119",m:"Calatrava 39 · guilloché"},{r:"5212A",m:"Calatrava Weekly Calendar"},
+{r:"5270G",m:"Perpetual Calendar Chronograph"},{r:"5236P",m:"In-Line Perpetual Calendar"},{r:"5320G",m:"Perpetual Calendar"},
+{r:"5204",m:"Split-Seconds Perpetual Calendar"},{r:"5172G",m:"Chronograph"},{r:"5905/1A",m:"Annual Calendar Chronograph"},{r:"5524G",m:"Calatrava Pilot Travel Time"}],
+"Audemars Piguet":[
+{r:"15510ST",m:"Royal Oak Selfwinding 41"},{r:"15500ST",m:"Royal Oak Selfwinding 41 · prev."},{r:"15450ST",m:"Royal Oak Selfwinding 37"},
+{r:"15400ST",m:"Royal Oak 41 · prev."},{r:"16202ST",m:"Royal Oak Jumbo Extra-Thin"},{r:"15202ST",m:"Royal Oak Jumbo · prev."},
+{r:"26240ST",m:"Royal Oak Chronograph 41"},{r:"26331ST",m:"Royal Oak Chronograph 41 · prev."},{r:"15407ST",m:"Royal Oak Double Balance Openworked"},
+{r:"26715ST",m:"Royal Oak Selfwinding 34"},{r:"77350ST",m:"Royal Oak 34"},{r:"15500OR",m:"Royal Oak 41 · rose gold"},
+{r:"26470ST",m:"Royal Oak Offshore Chrono 42"},{r:"26420SO",m:"Royal Oak Offshore Chrono 43"},{r:"15710ST",m:"Royal Oak Offshore Diver"},{r:"77450ST",m:"Royal Oak Offshore Selfwinding 37"},
+{r:"15210BC",m:"Code 11.59 Selfwinding"},{r:"26393CR",m:"Code 11.59 Selfwinding Chronograph"}],
+"Richard Mille":[
+{r:"RM 011",m:"Felipe Massa Flyback Chronograph"},{r:"RM 030",m:"Declutchable Rotor"},{r:"RM 035",m:"Rafael Nadal"},{r:"RM 055",m:"Bubba Watson"},
+{r:"RM 010",m:"Automatic"},{r:"RM 029",m:"Automatic Oversize Date"},{r:"RM 067",m:"Extra Flat Automatic"},{r:"RM 016",m:"Extra Flat"},
+{r:"RM 07-01",m:"Automatic · ladies"},{r:"RM 027",m:"Tourbillon Rafael Nadal"},{r:"RM 65-01",m:"Automatic Split-Seconds Chrono"},
+{r:"RM 72-01",m:"Lifestyle Flyback Chronograph"},{r:"RM 052",m:"Tourbillon Skull"},{r:"RM 12-01",m:"Tourbillon"},{r:"RM 033",m:"Extra Flat Automatic"},
+{r:"RM 53-01",m:"Tourbillon Pablo Mac Donough"},{r:"RM 25-01",m:"Tourbillon Sylvester Stallone"},{r:"RM 50-03",m:"Tourbillon Split-Seconds McLaren F1"}],
+"A. Lange & Söhne":[
+{r:"191.032",m:"Lange 1"},{r:"191.039",m:"Lange 1 · pink gold"},{r:"722.032",m:"Lange 1 Time Zone"},{r:"192.032",m:"Little Lange 1"},
+{r:"139.032",m:"Lange 1 Moon Phase"},{r:"310.025",m:"Grand Lange 1"},{r:"308.025",m:"Lange 1 Daymatic"},
+{r:"363.179",m:"Odysseus · steel"},{r:"405.031",m:"Datograph Up/Down"},{r:"345.031",m:"Datograph Perpetual"},
+{r:"414.028",m:"1815 Chronograph"},{r:"234.032",m:"1815"},{r:"140.029",m:"Zeitwerk"},
+{r:"211.027",m:"Saxonia Thin"},{r:"381.032",m:"Saxonia Outsize Date"},{r:"297.032",m:"Saxonia Moon Phase"}]
+};
+let _refItems=[];
+let REF_CACHE=JSON.parse(localStorage.getItem('wa_refcache')||'{}');
+function curBrand(){const el=document.getElementById('f-brand-input');return el?el.value.trim():''}
+function brandRefs(brand){
+  if(!brand)return [];
+  const key=Object.keys(REFERENCES).find(k=>k.toLowerCase()===brand.toLowerCase());
+  let list=key?REFERENCES[key].slice():[];
+  const cache=REF_CACHE[brand.toLowerCase()];
+  if(cache&&cache.length)list=[...list,...cache];
+  const seen=new Set();
+  return list.filter(x=>{const k=(x.r||'').toLowerCase();if(!k||seen.has(k))return false;seen.add(k);return true});
+}
+function refCombo(value){
+  const ph=LANG==='it'?'Cerca o digita referenza…':'Search or type reference…';
+  return `<div class="field"><label>${T().reference}</label>
+    <div class="combo">
+      <input id="f-reference" type="text" autocomplete="off" value="${esc(value||'')}" placeholder="${ph}"
+        oninput="openRefList()" onfocus="openRefList()" onblur="setTimeout(closeRefList,150)"
+        onkeydown="if(event.key==='Enter'){event.preventDefault();closeRefList()}if(event.key==='Escape'){closeRefList()}">
+      <div class="combo-caret">▼</div>
+      <div class="combo-panel wide" id="ref-panel"></div>
+    </div></div>`;
+}
+function openRefList(){
+  const inp=document.getElementById('f-reference');if(!inp)return;
+  const brand=curBrand(),q=inp.value.toLowerCase().trim();
+  const panel=document.getElementById('ref-panel');
+  const all=brandRefs(brand);
+  if(!all.length){
+    panel.innerHTML=`<div class="combo-empty">${brand
+      ?(LANG==='it'?`Nessuna referenza per <b>${esc(brand)}</b> — premi ↻ Referenze (AI) per cercarle dal web`:`No references for <b>${esc(brand)}</b> — press ↻ References (AI) to fetch from web`)
+      :(LANG==='it'?'Scegli prima la marca':'Select a brand first')}</div>`;
+    panel.classList.add('open');return;
+  }
+  _refItems=all.filter(x=>!q||(x.r+' '+(x.m||'')).toLowerCase().includes(q));
+  if(!_refItems.length){panel.innerHTML=`<div class="combo-empty">${LANG==='it'?'Nessun risultato':'No match'}</div>`;panel.classList.add('open');return}
+  panel.innerHTML=_refItems.map((x,i)=>`<div class="combo-item ref" onmousedown="pickRef(${i})">
+    <span class="ref-no">${esc(x.r)}</span><span class="ref-m">${esc(x.m||'')}</span></div>`).join('');
+  panel.classList.add('open');
+}
+function pickRef(i){
+  const x=_refItems[i];if(!x)return;
+  const ri=document.getElementById('f-reference');if(ri)ri.value=x.r||'';
+  const mi=document.getElementById('f-model');if(mi&&x.m)mi.value=x.m;
+  closeRefList();
+  loadRefImage(); // representative image (Wikimedia, no API key needed)
+  setTimeout(()=>estimateMarketPrice(true),60); // secondary-market average + AI image fallback
+}
+function closeRefList(){const p=document.getElementById('ref-panel');if(p)p.classList.remove('open')}
+async function fetchReferences(){
+  const t=T();const brand=curBrand();const btn=document.getElementById('ref-ai-btn');const panel=document.getElementById('ref-panel');
+  if(!brand){openRefList();return}
+  if(btn){btn.disabled=true;btn.innerHTML=`<span class="spin"></span>${t.refLoading}`}
+  const prompt=`List current and notable production references for the watch brand "${brand}". Search official brand sources and reputable catalogs. Return ONLY a JSON array, no prose, no markdown fences:
+[{"r":"<exact reference number>","m":"<model name / line, concise>"}]
+Include the most traded and important references (aim for 25-40). Use exact reference numbers.`;
+  try{
+    const txt=await callClaude([{role:'user',content:prompt}],[{type:'web_search_20250305',name:'web_search'}]);
+    const clean=txt.replace(/```json|```/g,'').trim();
+    const mm=clean.match(/\[[\s\S]*\]/);
+    const arr=JSON.parse(mm?mm[0]:clean);
+    if(Array.isArray(arr)&&arr.length){
+      REF_CACHE[brand.toLowerCase()]=arr.filter(x=>x&&x.r).map(x=>({r:String(x.r),m:String(x.m||'')}));
+      localStorage.setItem('wa_refcache',JSON.stringify(REF_CACHE));
+      openRefList();
+    }else throw new Error('empty');
+  }catch(e){
+    if(panel){const msg=(!ANTH_KEY&&!PROXY_URL)?t.aiNoKey:t.aiErr;
+      panel.innerHTML=`<div class="combo-empty"><span style="color:var(--neg)">${esc(msg)}</span></div>`;panel.classList.add('open')}
+  }finally{if(btn){btn.disabled=false;btn.innerHTML=`↻ ${t.refUpdate}`}}
+}
+
+/* ============ EDITOR ============ */
+function field(label,id,val,type='text',hint=''){
+  return `<div class="field"><label>${label}</label>
+    <input id="f-${id}" type="${type}" value="${esc(val||'')}">${hint?`<div class="hint">${hint}</div>`:''}</div>`;
+}
+function money_field(label,id,val){
+  return `<div class="field"><label>${label}</label><div class="input-prefix"><span>${CUR.trim()}</span>
+    <input id="f-${id}" type="number" inputmode="decimal" value="${val??''}"></div></div>`;
+}
+function selectField(label,id,val,opts){
+  return `<div class="field"><label>${label}</label><select id="f-${id}">
+    ${opts.map(([v,l])=>`<option value="${v}"${v===val?' selected':''}>${l}</option>`).join('')}</select></div>`;
+}
+function textareaField(label,id,val){
+  return `<div class="field"><label>${label}</label><textarea id="f-${id}">${esc(val||'')}</textarea></div>`;
+}
+
+function openEditor(id){
+  const t=T();
+  const w = id ? DATA.find(x=>x.id===id) : {};
+  editingId = id||null;
+  formPhotos = (w.photos||[]).slice();
+  _lastBrandVal = w.brand||'';
+  const setOpts=[['',t.setNA],['full',t.setFull],['papers',t.setPapers],['watch',t.setWatch]];
+  const condOpts=[['',''],['new',t.condNew],['unworn',t.condUnworn],['exc',t.condExc],['good',t.condGood],['fair',t.condFair]];
+  const statusOpts=[['stock',t.stock],['reserved',t.reserved],['consignment',t.consignment],['collection',t.collection],['sold',t.sold]];
+  const chanOpts=[['',''],['private',t.chPrivate],['dealer',t.chDealer],['auction',t.chAuction],['retail',t.chRetail],['trade',t.chTrade]];
+
+  document.getElementById('modal').innerHTML=`
+    <div class="modal-head">
+      <h2>${id?t.edit:t.new}</h2>
+      <button class="icon-btn" onclick="closeOverlay()"><svg viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="fieldset"><div class="legend"><span class="n">1</span>${t.sIdent}
+          <button type="button" class="btn ghost" id="ref-ai-btn" style="margin-left:auto;font-size:11.5px;padding:5px 10px" onclick="fetchReferences()">↻ ${t.refUpdate}</button>
+        </div>
+        <div class="row">${brandCombo(w.brand)}${field(t.model,'model',w.model)}</div>
+        <div class="row three">${refCombo(w.reference)}${field(t.serial,'serial',w.serial)}${field(t.movement,'movementNo',w.movementNo)}</div>
+        <div class="row">${field(t.invNo,'invNo',w.invNo,'text',t.invHint)}${field(t.yearProd,'yearProd',w.yearProd)}</div>
+      </div>
+      <div class="fieldset"><div class="legend"><span class="n">2</span>${t.sTech}</div>
+        <div class="row three">${field(t.caliber,'caliber',w.caliber)}${field(t.caseMat,'caseMat',w.caseMat)}${field(t.caseSize,'caseSize',w.caseSize)}</div>
+        <div class="row">${field(t.dial,'dial',w.dial)}${field(t.bracelet,'bracelet',w.bracelet)}</div>
+      </div>
+      <div class="fieldset"><div class="legend"><span class="n">3</span>${t.sSet}</div>
+        <div class="row three">${selectField(t.setType,'setType',w.setType||'',setOpts)}${selectField(t.cond,'cond',w.cond||'',condOpts)}${field(t.cardDate,'cardDate',w.cardDate,'date')}</div>
+      </div>
+      <div class="fieldset"><div class="legend"><span class="n">4</span>${t.sAcq}</div>
+        <div class="row three">${field(t.acqDate,'acqDate',w.acqDate,'date')}${money_field(t.acqPrice,'acqPrice',w.acqPrice)}${selectField(t.acqChannel,'acqChannel',w.acqChannel||'',chanOpts)}</div>
+        <div class="row full">${field(t.acqSource,'acqSource',w.acqSource)}</div>
+      </div>
+      <div class="fieldset"><div class="legend"><span class="n">5</span>${t.sVal}
+          <button type="button" class="btn ghost" style="margin-left:auto;font-size:11.5px;padding:5px 10px" onclick="estimateMarketPrice()" id="ai-btn">
+            <svg viewBox="0 0 24 24" fill="none" style="width:13px;height:13px"><path d="M12 3l1.8 4.6L18.5 9l-4.7 1.4L12 15l-1.8-4.6L5.5 9l4.7-1.4L12 3zM19 14l.8 2.2L22 17l-2.2.8L19 20l-.8-2.2L16 17l2.2-.8L19 14z" fill="currentColor"/></svg>
+            ${t.aiEstimate}</button>
+        </div>
+        <div class="row three">${money_field(t.marketVal,'marketValue',w.marketValue)}${money_field(t.asking,'askingPrice',w.askingPrice)}${money_field(t.insurance,'insuranceValue',w.insuranceValue)}</div>
+        <div id="ai-result" class="ai-result"></div>
+        <div class="row">${field(t.valDate,'valDate',w.valDate,'date')}</div>
+      </div>
+      <div class="fieldset"><div class="legend"><span class="n">6</span>${t.sStatus}</div>
+        <div class="row">${selectField(t.status,'status',w.status||'stock',statusOpts)}${field(t.location,'location',w.location)}</div>
+      </div>
+      <div class="fieldset"><div class="legend"><span class="n">7</span>${t.sSale}</div>
+        <div class="row three">${field(t.saleDate,'saleDate',w.saleDate,'date')}${money_field(t.salePrice,'salePrice',w.salePrice)}${field(t.buyer,'buyer',w.buyer)}</div>
+      </div>
+      <div class="fieldset"><div class="legend"><span class="n">8</span>${t.sService}</div>
+        <div class="row">${field(t.lastService,'lastService',w.lastService,'date')}${field(t.serviceNotes,'serviceNotes',w.serviceNotes)}</div>
+      </div>
+      <div class="fieldset"><div class="legend"><span class="n">9</span>${t.sNotes}</div>
+        ${textareaField(t.notes,'notes',w.notes)}
+      </div>
+      <div class="fieldset"><div class="legend"><span class="n">★</span>${t.sPhotos}</div>
+        <div class="photos" id="photo-strip"></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <div>${id?`<button class="btn danger" onclick="deleteWatch('${id}')">${t.delete}</button>`:''}</div>
+      <div class="right">
+        <button class="btn ghost" onclick="closeOverlay()">${t.cancel}</button>
+        <button class="btn gold" onclick="saveWatch()">${t.save}</button>
+      </div>
+    </div>`;
+  renderPhotoStrip();
+  document.getElementById('overlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+
+function renderPhotoStrip(){
+  const t=T();
+  document.getElementById('photo-strip').innerHTML=
+    formPhotos.map((p,i)=>`<div class="photo" style="background-image:url('${p}')">
+      <div class="rm" onclick="rmPhoto(${i})">×</div></div>`).join('')+
+    `<label class="add-photo"><svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <input type="file" accept="image/*" multiple onchange="addPhotos(event)"></label>`;
+}
+function rmPhoto(i){formPhotos.splice(i,1);renderPhotoStrip()}
+function addPhotos(e){
+  const files=[...e.target.files];
+  files.forEach(file=>{
+    const r=new FileReader();
+    r.onload=ev=>{resizeImage(ev.target.result,1200,.82,(dataUrl)=>{formPhotos.push(dataUrl);renderPhotoStrip()})};
+    r.readAsDataURL(file);
+  });
+  e.target.value='';
+}
+function resizeImage(src,maxDim,quality,cb){
+  const img=new Image();
+  img.onload=()=>{
+    let{width:w,height:h}=img;
+    if(Math.max(w,h)>maxDim){const s=maxDim/Math.max(w,h);w=Math.round(w*s);h=Math.round(h*s)}
+    const c=document.createElement('canvas');c.width=w;c.height=h;
+    c.getContext('2d').drawImage(img,0,0,w,h);
+    cb(c.toDataURL('image/jpeg',quality));
+  };
+  img.src=src;
+}
+
+function gv(id){const el=document.getElementById('f-'+id);return el?el.value.trim():''}
+function saveWatch(){
+  const t=T();
+  const brand=(document.getElementById('f-brand-input').value||'').trim(),model=gv('model');
+  if(!brand&&!model){toast(t.needBM,'err');return}
+  const rec={
+    id: editingId||uid(),
+    invNo: gv('invNo')||(editingId?(DATA.find(x=>x.id===editingId)||{}).invNo:'')||nextInvNo(),
+    brand,model,reference:gv('reference'),serial:gv('serial'),movementNo:gv('movementNo'),yearProd:gv('yearProd'),
+    caliber:gv('caliber'),caseMat:gv('caseMat'),caseSize:gv('caseSize'),dial:gv('dial'),bracelet:gv('bracelet'),
+    setType:gv('setType'),cond:gv('cond'),cardDate:gv('cardDate'),
+    acqDate:gv('acqDate'),acqPrice:gv('acqPrice'),acqChannel:gv('acqChannel'),acqSource:gv('acqSource'),
+    marketValue:gv('marketValue'),askingPrice:gv('askingPrice'),insuranceValue:gv('insuranceValue'),valDate:gv('valDate'),
+    status:gv('status')||'stock',location:gv('location'),
+    saleDate:gv('saleDate'),salePrice:gv('salePrice'),buyer:gv('buyer'),
+    lastService:gv('lastService'),serviceNotes:gv('serviceNotes'),
+    notes:gv('notes'),photos:formPhotos.slice(),
+    createdAt: editingId?(DATA.find(x=>x.id===editingId)||{}).createdAt||Date.now():Date.now(),
+    updatedAt: Date.now()
+  };
+  if(editingId){const i=DATA.findIndex(x=>x.id===editingId);DATA[i]=rec}else{DATA.unshift(rec)}
+  if(save()){closeOverlay();fillFilters();refresh()}
+}
+async function deleteWatch(id){
+  const ok=await uiConfirm(T().confirmDel,{danger:true,yes:T().delete});
+  if(!ok)return;
+  DATA=DATA.filter(x=>x.id!==id);save();closeOverlay();fillFilters();refresh();
+  toast(LANG==='it'?'Pezzo eliminato':'Piece deleted','ok');
+}
+
+/* ============ DETAIL ============ */
+function specRow(k,v){if(!v)return '';return `<div class="spec"><div class="k">${k}</div><div class="v">${esc(v)}</div></div>`}
+function openDetail(id){
+  const w=DATA.find(x=>x.id===id);if(!w)return;
+  const t=T();detailPhotoIdx=0;
+  const pl=(+w.marketValue||+w.acqPrice||0)-(+w.acqPrice||0);
+  const plc=pl>=0?'pos':'neg';
+  const setLabel={full:t.setFull,papers:t.setPapers,watch:t.setWatch}[w.setType]||'';
+  const condLabel={new:t.condNew,unworn:t.condUnworn,exc:t.condExc,good:t.condGood,fair:t.condFair}[w.cond]||'';
+  const chanLabel={private:t.chPrivate,dealer:t.chDealer,auction:t.chAuction,retail:t.chRetail,trade:t.chTrade}[w.acqChannel]||'';
+  const mainSrc=(w.photos&&w.photos[0])||repoImg(w);
+  const mainPh=`<div class="main-ph" id="main-ph"><div class="ph">${WATCH_SVG}</div>`+
+    (mainSrc?`<img class="thumb-img" id="main-ph-img" src="${esc(mainSrc)}" alt="" referrerpolicy="no-referrer" onerror="this.remove()">`:'')+`</div>`;
+  const thumbs = (w.photos||[]).map((p,i)=>`<div class="t${i===0?' sel':''}" style="background-image:url('${p}')" onclick="swapDetail('${id}',${i})"></div>`).join('');
+
+  document.getElementById('modal').innerHTML=`
+    <div class="modal-head">
+      <h2>${esc(w.brand||'')} ${esc(w.model||'')}</h2>
+      <button class="icon-btn no-print" onclick="window.print()" title="${t.print}"><svg viewBox="0 0 24 24" fill="none"><path d="M6 9V3h12v6M6 18H4a2 2 0 01-2-2v-4a2 2 0 012-2h16a2 2 0 012 2v4a2 2 0 01-2 2h-2M6 14h12v7H6z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button class="icon-btn no-print" onclick="openEditor('${id}')" title="${t.edit}"><svg viewBox="0 0 24 24" fill="none"><path d="M4 20l4-1 10-10-3-3L5 16l-1 4z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg></button>
+      <button class="icon-btn" onclick="closeOverlay()"><svg viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="detail-hero">
+        <div class="detail-gallery">${mainPh}<div class="detail-thumbs" id="d-thumbs">${thumbs}</div></div>
+        <div class="detail-meta">
+          <span class="status-tag ${statusClass(w.status)}" style="position:static;display:inline-block;margin-bottom:9px">${statusLabel(w.status)}</span>
+          <div class="brand-name">${esc(w.brand||'')} <span style="color:var(--muted-2)">· ${esc(w.invNo||'')}</span></div>
+          <h2 class="dm">${esc(w.model||'')}</h2>
+          <div class="ref">${esc(w.reference||'')}${w.yearProd?' · '+esc(w.yearProd):''}</div>
+          <div class="spec-grid">
+            ${specRow(t.serial,w.serial)}${specRow(t.movement,w.movementNo)}
+            ${specRow(t.caliber,w.caliber)}${specRow(t.caseMat,w.caseMat)}
+            ${specRow(t.caseSize,w.caseSize)}${specRow(t.dial,w.dial)}
+            ${specRow(t.bracelet,w.bracelet)}${specRow(t.setType,setLabel)}
+            ${specRow(t.cond,condLabel)}${specRow(t.cardDate,w.cardDate)}
+          </div>
+        </div>
+      </div>
+
+      <div class="fin-strip">
+        <div class="fin"><div class="k">${t.acqPrice}</div><div class="v">${money(w.acqPrice)}</div></div>
+        <div class="fin"><div class="k">${t.marketVal}</div><div class="v">${money(w.marketValue)}</div></div>
+        <div class="fin"><div class="k">${t.plLab}</div><div class="v ${plc}">${pl>=0?'+':'−'}${money(Math.abs(pl)).replace(CUR,CUR)}</div></div>
+      </div>
+
+      <div class="detail-section"><div class="legend">${t.sAcq} · ${t.sVal}</div>
+        <div class="spec-grid">
+          ${specRow(t.acqDate,w.acqDate)}${specRow(t.acqChannel,chanLabel)}
+          ${specRow(t.acqSource,w.acqSource)}${specRow(t.asking,money(w.askingPrice))}
+          ${specRow(t.insurance,money(w.insuranceValue))}${specRow(t.valDate,w.valDate)}
+          ${specRow(t.location,w.location)}
+        </div>
+      </div>
+
+      ${(w.saleDate||w.salePrice||w.buyer)?`<div class="detail-section"><div class="legend">${t.sSale}</div>
+        <div class="spec-grid">${specRow(t.saleDate,w.saleDate)}${specRow(t.salePrice,money(w.salePrice))}${specRow(t.buyer,w.buyer)}</div></div>`:''}
+
+      ${(w.lastService||w.serviceNotes)?`<div class="detail-section"><div class="legend">${t.sService}</div>
+        <div class="spec-grid">${specRow(t.lastService,w.lastService)}${specRow(t.serviceNotes,w.serviceNotes)}</div></div>`:''}
+
+      ${w.notes?`<div class="detail-section"><div class="legend">${t.notes}</div><div class="note-box">${esc(w.notes)}</div></div>`:''}
+      <div class="detail-section"><div class="legend">${t.descLegend}
+        <button type="button" class="btn ghost no-print" style="margin-left:auto;font-size:11.5px;padding:5px 10px" id="desc-btn" onclick="generateDescription('${w.id}')">
+          <svg viewBox="0 0 24 24" fill="none" style="width:13px;height:13px"><path d="M12 3l1.8 4.6L18.5 9l-4.7 1.4L12 15l-1.8-4.6L5.5 9l4.7-1.4L12 3z" fill="currentColor"/></svg> ${t.descGen}</button>
+      </div>
+        <div id="desc-out" class="note-box" style="display:none"></div>
+      </div>
+    </div>`;
+  document.getElementById('overlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+async function generateDescription(id){
+  const w=DATA.find(x=>x.id===id);if(!w)return;const t=T();
+  const btn=document.getElementById('desc-btn'),out=document.getElementById('desc-out');
+  out.style.display='block';out.innerHTML=`<span class="spin"></span>${t.descLoading}`;
+  if(btn)btn.disabled=true;
+  const lang=LANG==='it'?'Italian':'English';
+  const specs=[['Brand',w.brand],['Model',w.model],['Reference',w.reference],['Year',w.yearProd],
+    ['Case',w.caseMat],['Size',w.caseSize],['Dial',w.dial],['Bracelet',w.bracelet],
+    ['Set',{full:'full set',papers:'papers only',watch:'watch only'}[w.setType]||''],
+    ['Condition',{new:'new/unworn',unworn:'mint',exc:'excellent',good:'good',fair:'fair'}[w.cond]||'']]
+    .filter(x=>x[1]).map(x=>x[0]+': '+x[1]).join('\n');
+  const prompt=`Write a compelling but factual sales listing description in ${lang} for this luxury watch, suitable for Chrono24 or Instagram. 2 short paragraphs, no invented facts, no price. Highlight desirability, condition and set. Watch:\n${specs}`;
+  try{
+    const txt=await callClaude([{role:'user',content:prompt}]);
+    out.textContent=txt.trim();
+    const copy=document.createElement('button');copy.className='btn ghost no-print';copy.style.cssText='margin-top:10px;font-size:11.5px;padding:5px 10px';
+    copy.textContent=t.descCopy;copy.onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText(out.textContent);toast(t.descCopied,'ok')};
+    out.appendChild(document.createElement('br'));out.appendChild(copy);
+  }catch(e){out.innerHTML=`<span style="color:var(--neg)">${(!ANTH_KEY&&!PROXY_URL)?esc(t.aiNoKey):esc(t.aiErr)}</span>`}
+  finally{if(btn)btn.disabled=false}
+}
+function swapDetail(id,i){
+  const w=DATA.find(x=>x.id===id);if(!w||!w.photos[i])return;
+  detailPhotoIdx=i;
+  let img=document.getElementById('main-ph-img');
+  if(!img){img=document.createElement('img');img.className='thumb-img';img.id='main-ph-img';img.referrerPolicy='no-referrer';
+    img.onerror=function(){this.remove()};document.getElementById('main-ph').appendChild(img)}
+  img.src=w.photos[i];
+  [...document.querySelectorAll('#d-thumbs .t')].forEach((el,j)=>el.classList.toggle('sel',j===i));
+}
+
+function closeOverlay(){document.getElementById('overlay').classList.remove('open');document.body.style.overflow=''}
+document.getElementById('overlay').addEventListener('click',e=>{if(e.target.id==='overlay')closeOverlay()});
+document.getElementById('confirm-overlay').addEventListener('click',e=>{if(e.target.id==='confirm-overlay')closeConfirm(false)});
+
+/* ============ BACKUP ============ */
+function exportCSV(){
+  if(!DATA.length){toast(LANG==='it'?'Archivio vuoto':'Empty archive');return}
+  const cols=['invNo','brand','model','reference','serial','movementNo','yearProd','caseMat','setType','cond','status','location','acqDate','acqPrice','acqSource','marketValue','askingPrice','insuranceValue','saleDate','salePrice','buyer'];
+  const cell=v=>{v=(v==null?'':String(v));return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};
+  const rows=DATA.map(w=>cols.map(c=>cell(w[c])).join(','));
+  const blob=new Blob(['\ufeff'+cols.join(',')+'\n'+rows.join('\n')],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='archivio-orologi-'+new Date().toISOString().slice(0,10)+'.csv';a.click();
+}
+function exportJSON(){
+  const blob=new Blob([JSON.stringify({app:'watch-archive',version:1,exported:new Date().toISOString(),data:DATA},null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='archivio-orologi-'+new Date().toISOString().slice(0,10)+'.json';a.click();
+}
+function importJSON(e){
+  const file=e.target.files[0];if(!file)return;
+  const r=new FileReader();
+  r.onload=async ev=>{
+    try{
+      const obj=JSON.parse(ev.target.result);
+      const incoming=Array.isArray(obj)?obj:obj.data;
+      if(!Array.isArray(incoming))throw 0;
+      const replace=await uiConfirm(T().importMode,{
+        yes:LANG==='it'?'Sostituisci':'Replace',
+        no:LANG==='it'?'Unisci':'Merge'});
+      if(replace){DATA=incoming}
+      else{const ids=new Set(DATA.map(w=>w.id));incoming.forEach(w=>{if(!ids.has(w.id))DATA.push(w)})}
+      save();fillFilters();refresh();toast(T().importOk(incoming.length),'ok');
+    }catch(err){toast(T().importErr,'err')}
+    e.target.value='';
+  };
+  r.readAsText(file);
+}
+
+/* ============ SETTINGS ============ */
+function setLang(l){LANG=l;localStorage.setItem('wa_lang',l);
+  document.getElementById('lang-it').classList.toggle('on',l==='it');
+  document.getElementById('lang-en').classList.toggle('on',l==='en');
+  document.documentElement.lang=l;applyStatic();fillFilters();render();
+  if(document.getElementById('overlay').classList.contains('open')&&editingId!==null){/* keep */}
+}
+function setCurrency(c){CUR=c;localStorage.setItem('wa_cur',c);render()}
+function applyStatic(){
+  const t=T();
+  const eb=document.getElementById('wm-eyebrow');
+  if(eb)eb.innerHTML=`HOROLOGY <span class="sep">·</span> ${esc(COLL_NAME)} <span class="ver">v1.0</span>`;
+  document.title='Watch Desk Vault';
+  document.getElementById('t-new').textContent=t.new;
+  document.getElementById('t-backup').textContent=t.backup;
+  document.getElementById('t-import').textContent=t.import;
+  document.getElementById('t-sync').textContent=t.sync;
+  document.getElementById('tab-inv').textContent=t.tabInv;
+  document.getElementById('tab-an').textContent=t.tabAn;
+  document.getElementById('search').placeholder=LANG==='it'?'Cerca marca, modello, referenza, seriale…':'Search brand, model, reference, serial…';
+}
+
+/* ============ GITHUB SYNC (private repo as database) ============ */
+let GH=JSON.parse(localStorage.getItem('wa_gh')||'{}'); // {token,owner,repo,path,branch,auto,sha}
+let ANTH_KEY=localStorage.getItem('wa_anth')||'';
+let PROXY_URL=localStorage.getItem('wa_proxy')||'';
+let PROXY_SECRET=localStorage.getItem('wa_proxysec')||'';
+let pushTimer=null;
+function ghConfigured(){return GH.token&&GH.owner&&GH.repo}
+function ghPath(){return (GH.path||'archive.json')}
+function ghBranch(){return (GH.branch||'main')}
+function b64enc(str){return btoa(unescape(encodeURIComponent(str)))}
+function b64dec(b64){return decodeURIComponent(escape(atob((b64||'').replace(/\n/g,''))))}
+function ghHeaders(){return {Authorization:'Bearer '+GH.token,Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'}}
+function ghUrl(){return `https://api.github.com/repos/${GH.owner}/${GH.repo}/contents/${encodeURIComponent(ghPath()).replace(/%2F/g,'/')}`}
+
+function setSyncBadge(state){ // ok | busy | err | off
+  const dot=document.getElementById('sync-dot');if(!dot)return;
+  const colors={ok:'var(--pos)',busy:'var(--gold)',err:'var(--neg)',off:'var(--muted-2)'};
+  dot.style.background=colors[state]||colors.off;
+  dot.style.boxShadow= state==='ok'?'0 0 6px var(--pos)':'none';
+  const sd=document.querySelector('.sync-state .d');
+  if(sd){sd.className='d '+(state==='off'?'':state)}
+}
+function scheduleGhPush(){
+  if(!ghConfigured()||!GH.auto)return;
+  clearTimeout(pushTimer);
+  pushTimer=setTimeout(()=>ghPush(true),1400);
+}
+async function ghPull(confirmReplace){
+  if(!ghConfigured()){return}
+  if(confirmReplace&&DATA.length&&!(await uiConfirm(T().ghConfirmPull,{yes:T().ghPull})))return;
+  setSyncBadge('busy');
+  try{
+    const r=await fetch(ghUrl()+'?ref='+encodeURIComponent(ghBranch()),{headers:ghHeaders()});
+    if(r.status===404){GH.sha=null;localStorage.setItem('wa_gh',JSON.stringify(GH));setSyncBadge('ok');return}
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    const j=await r.json();
+    GH.sha=j.sha;localStorage.setItem('wa_gh',JSON.stringify(GH));
+    const obj=JSON.parse(b64dec(j.content));
+    const incoming=Array.isArray(obj)?obj:obj.data;
+    if(Array.isArray(incoming)){DATA=incoming;localStorage.setItem(LS_KEY,JSON.stringify(DATA));fillFilters();render();
+      if(confirmReplace)toast(T().ghPulled(incoming.length),'ok');}
+    setSyncBadge('ok');
+  }catch(e){setSyncBadge('err');if(confirmReplace)toast(T().ghErr+e.message,'err')}
+}
+async function ghPush(silent){
+  if(!ghConfigured()){if(!silent)toast(T().ghErrCfg,'err');return}
+  setSyncBadge('busy');
+  try{
+    const payload=JSON.stringify({app:'watch-archive',version:1,updated:new Date().toISOString(),data:DATA},null,2);
+    const body={message:'archive update '+new Date().toISOString(),content:b64enc(payload),branch:ghBranch()};
+    if(GH.sha)body.sha=GH.sha;
+    let r=await fetch(ghUrl(),{method:'PUT',headers:{...ghHeaders(),'Content-Type':'application/json'},body:JSON.stringify(body)});
+    if(r.status===409){ // sha conflict — refetch sha then retry once
+      const g=await fetch(ghUrl()+'?ref='+encodeURIComponent(ghBranch()),{headers:ghHeaders()});
+      if(g.ok){GH.sha=(await g.json()).sha;body.sha=GH.sha;
+        r=await fetch(ghUrl(),{method:'PUT',headers:{...ghHeaders(),'Content-Type':'application/json'},body:JSON.stringify(body)});}
+    }
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    const j=await r.json();GH.sha=j.content.sha;localStorage.setItem('wa_gh',JSON.stringify(GH));
+    setSyncBadge('ok');if(!silent)toast(T().ghPushed,'ok');
+  }catch(e){setSyncBadge('err');if(!silent)toast(T().ghErr+e.message,'err')}
+}
+
+/* ============ SETTINGS MODAL ============ */
+function setField(label,id,val,type='text',ph=''){
+  return `<div class="field"><label>${label}</label>
+    <input id="set-${id}" type="${type}" value="${esc(val||'')}" placeholder="${esc(ph)}" autocomplete="off" autocapitalize="off" spellcheck="false"></div>`;
+}
+function openSettings(){
+  const t=T();
+  document.getElementById('modal').innerHTML=`
+    <div class="modal-head"><h2>${t.setTitle}</h2>
+      <button class="icon-btn" onclick="closeOverlay()"><svg viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="fieldset"><div class="legend">${t.setGh}</div>
+        <div class="set-note">${t.setGhNote}</div>
+        <div class="sync-state" style="margin-bottom:12px"><span class="d ${ghConfigured()?'ok':''}"></span><span id="set-state">${ghConfigured()?t.stOk:t.stOff}</span></div>
+        <div class="row full">${setField(t.ghToken,'token',GH.token,'password','github_pat_…')}</div>
+        <div class="row">${setField(t.ghOwner,'owner',GH.owner,'text','giovannifasciano-stack')}${setField(t.ghRepo,'repo',GH.repo,'text','watch-archive-data')}</div>
+        <div class="row">${setField(t.ghPath,'path',GH.path||'archive.json','text','archive.json')}${setField(t.ghBranch,'branch',GH.branch||'main','text','main')}</div>
+        <div class="field" style="margin-top:4px"><label style="display:flex;align-items:center;gap:9px;text-transform:none;letter-spacing:0;font-size:13px;cursor:pointer">
+          <input type="checkbox" id="set-auto" ${GH.auto?'checked':''} style="width:auto;margin:0">${t.ghAuto}</label></div>
+        <div class="sync-row">
+          <button class="btn" onclick="saveSettings(true)"><svg viewBox="0 0 24 24" fill="none" style="width:14px;height:14px"><path d="M12 15V3m0 12l-4-4m4 4l4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" transform="rotate(180 12 12)"/></svg>${t.ghPull}</button>
+          <button class="btn gold" onclick="saveSettings('push')"><svg viewBox="0 0 24 24" fill="none" style="width:14px;height:14px"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>${t.ghPush}</button>
+        </div>
+      </div>
+      <div class="fieldset"><div class="legend">${t.setBrandName}</div>
+        <div class="set-note">${t.setBrandNote}</div>
+        <div class="row full">${setField(t.collName,'collname',COLL_NAME,'text','PRIVATE COLLECTION')}</div>
+      </div>
+      <div class="fieldset"><div class="legend">${t.setImg}</div>
+        <div class="set-note">${t.setImgNote}</div>
+        <div class="row full">${setField(t.imgBase,'imgbase',IMG_BASE,'text','img')}</div>
+      </div>
+      <div class="fieldset"><div class="legend">${t.setAi}</div>
+        <div class="set-note">${t.setProxyNote}</div>
+        <div class="row full">${setField(t.proxyUrl,'proxy',PROXY_URL,'text','https://watch-desk-ai.tuo-utente.workers.dev')}</div>
+        <div class="row full">${setField(t.proxySecret,'proxysec',PROXY_SECRET,'password','(opzionale)')}</div>
+        <div class="set-note" style="margin-top:10px">${t.setAiNote}</div>
+        <div class="row full">${setField(t.anthKey,'anth',ANTH_KEY,'password','sk-ant-…')}</div>
+      </div>
+    </div>
+    <div class="modal-foot"><div></div><div class="right">
+      <button class="btn ghost" onclick="closeOverlay()">${t.close}</button>
+      <button class="btn gold" onclick="saveSettings()">${t.save}</button>
+    </div></div>`;
+  document.getElementById('overlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function sv(id){const el=document.getElementById('set-'+id);return el?el.value.trim():''}
+function saveSettings(action){
+  GH={token:sv('token'),owner:sv('owner'),repo:sv('repo'),path:sv('path')||'archive.json',
+      branch:sv('branch')||'main',auto:document.getElementById('set-auto').checked,sha:GH.sha};
+  localStorage.setItem('wa_gh',JSON.stringify(GH));
+  ANTH_KEY=sv('anth');localStorage.setItem('wa_anth',ANTH_KEY);
+  PROXY_URL=sv('proxy').replace(/\/+$/,'');localStorage.setItem('wa_proxy',PROXY_URL);
+  PROXY_SECRET=sv('proxysec');localStorage.setItem('wa_proxysec',PROXY_SECRET);
+  IMG_BASE=sv('imgbase');localStorage.setItem('wa_imgbase',IMG_BASE);
+  COLL_NAME=sv('collname')||'PRIVATE COLLECTION';localStorage.setItem('wa_collname',COLL_NAME);
+  applyStatic();
+  setSyncBadge(ghConfigured()?'ok':'off');
+  render();
+  if(action==='push'){ghPush(false)}
+  else if(action===true){ghPull(true)}
+  else{closeOverlay()}
+}
+
+/* ============ CLAUDE MARKET ESTIMATE ============ */
+async function callClaude(messages,tools){
+  const body={model:'claude-sonnet-4-6',max_tokens:1000,messages};
+  if(tools)body.tools=tools;
+  let url,headers={'Content-Type':'application/json'};
+  if(PROXY_URL){
+    url=PROXY_URL;                       // Cloudflare Worker adds the key server-side
+    if(PROXY_SECRET)headers['x-app-secret']=PROXY_SECRET;
+  }else{
+    url='https://api.anthropic.com/v1/messages';
+    if(ANTH_KEY){headers['x-api-key']=ANTH_KEY;headers['anthropic-version']='2023-06-01';headers['anthropic-dangerous-direct-browser-access']='true'}
+  }
+  const r=await fetch(url,{method:'POST',headers,body:JSON.stringify(body)});
+  if(!r.ok)throw new Error('HTTP '+r.status);
+  const data=await r.json();
+  return (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('\n');
+}
+function tryLoadImage(url){
+  return new Promise(res=>{
+    if(typeof url!=='string'||!/^https:\/\//i.test(url))return res(false);
+    const im=new Image();
+    try{im.referrerPolicy='no-referrer'}catch(_){}
+    let done=false;
+    const to=setTimeout(()=>{if(!done){done=true;res(false)}},7000);
+    im.onload=()=>{if(!done){done=true;clearTimeout(to);res(im.naturalWidth>10)}};
+    im.onerror=()=>{if(!done){done=true;clearTimeout(to);res(false)}};
+    im.src=url;
+  });
+}
+async function fetchModelImage(brand,model){
+  try{
+    if(!brand)return null;
+    const base=(model||'').split('·')[0].split('(')[0].trim();
+    const term=encodeURIComponent((brand+' '+base).trim());
+    const url=`https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=${term}&gsrlimit=1&prop=pageimages&piprop=thumbnail&pithumbsize=900&format=json&origin=*`;
+    const r=await fetch(url);if(!r.ok)return null;
+    const j=await r.json();
+    const pages=j&&j.query&&j.query.pages;if(!pages)return null;
+    for(const k in pages){const th=pages[k].thumbnail;if(th&&th.source)return th.source}
+    return null;
+  }catch(e){return null}
+}
+async function loadRefImage(){
+  if(formPhotos.length)return;
+  const brand=curBrand();const mi=document.getElementById('f-model');const model=mi?mi.value:'';
+  const ri=document.getElementById('f-reference');const ref=ri?ri.value:'';
+  // 1) your own repo image (most reliable), 2) Wikimedia fallback
+  let src='';
+  if(IMG_BASE&&ref){const cand=IMG_BASE.replace(/\/+$/,'')+'/'+saniRef(ref)+'.jpg';if(await tryLoadImage(cand))src=cand}
+  if(!src){const wk=await fetchModelImage(brand,model);if(wk&&await tryLoadImage(wk))src=wk}
+  if(src&&!formPhotos.length){formPhotos.unshift(src);renderPhotoStrip()}
+}
+async function estimateMarketPrice(auto){
+  const t=T();
+  const brand=(document.getElementById('f-brand-input').value||'').trim();
+  const model=(document.getElementById('f-model')?document.getElementById('f-model').value:'').trim();
+  const ref=gv('reference'),year=gv('yearProd'),set=gv('setType'),cond=gv('cond');
+  const box=document.getElementById('ai-result');
+  if(!brand||!model){if(!auto){box.className='ai-result show';box.innerHTML=`<span class="err">${t.aiNeedBM}</span>`}return}
+  const curName={'€':'EUR','CHF ':'CHF','$':'USD','£':'GBP','HK$':'HKD'}[CUR]||'EUR';
+  box.className='ai-result loading';box.innerHTML=`<span class="spin"></span>${t.aiLoading}`;
+  try{box.scrollIntoView({behavior:'smooth',block:'center'})}catch(_){}
+  const setTxt={full:'full set (box & papers)',papers:'papers only',watch:'watch only'}[set]||'';
+  const condTxt={new:'new/unworn',unworn:'mint',exc:'excellent',good:'good',fair:'fair'}[cond]||'';
+  const prompt=`You are a luxury-watch market analyst. Research the CURRENT secondary-market price for this watch by searching marketplaces and aggregators (Chrono24, WatchCharts, Bob's Watches, dealer listings):
+
+Brand: ${brand}
+Model: ${model}
+Reference: ${ref||'(unknown)'}
+Year: ${year||'(unspecified)'}
+Set: ${setTxt||'(unspecified)'}
+Condition: ${condTxt||'(unspecified)'}
+
+Return ONLY a JSON object, no prose, no markdown fences:
+{"estimate": <integer AVERAGE current secondary-market price in ${curName}>, "low": <integer typical low>, "high": <integer typical high>, "currency": "${curName}", "confidence": "low|medium|high", "note": "<one short sentence on how the figure was derived>", "sources": ["<site or marketplace names>"], "image": "<direct https URL to a representative product photo of this exact reference/model from a manufacturer, press, or Wikimedia source; must be directly hotlinkable and end in .jpg/.jpeg/.png/.webp; use empty string if not confident>"}
+"estimate" must be the average/typical asking price across current listings, not the cheapest or most expensive. Base figures on actual current listings. If the reference is unknown, estimate from the model and state lower confidence.`;
+  try{
+    const txt=await callClaude([{role:'user',content:prompt}],[{type:'web_search_20250305',name:'web_search'}]);
+    const clean=txt.replace(/```json|```/g,'').trim();
+    const m=clean.match(/\{[\s\S]*\}/);
+    const j=JSON.parse(m?m[0]:clean);
+    const mv=document.getElementById('f-marketValue');
+    if(mv&&j.estimate){mv.value=Math.round(j.estimate)}
+    const fmt=n=>CUR+Number(n).toLocaleString(LANG==='it'?'it-IT':'en-US',{maximumFractionDigits:0});
+    const srcs=(j.sources||[]).slice(0,6).map(s=>esc(String(s))).join(' · ');
+    box.className='ai-result show';
+    box.innerHTML=`<div><span class="est">${fmt(j.estimate)}</span> <span class="rng">· ${t.aiRange} ${fmt(j.low)}–${fmt(j.high)} · ${esc(j.confidence||'')}</span></div>
+      ${j.note?`<div style="color:var(--muted);margin-top:5px">${esc(j.note)}</div>`:''}
+      ${srcs?`<div class="src">${t.aiSources}: ${srcs}</div>`:''}
+      <div class="applied">✓ ${t.aiApplied}</div>`;
+    if(j.image && !formPhotos.length){
+      tryLoadImage(j.image).then(ok=>{
+        if(ok){formPhotos.unshift(j.image);renderPhotoStrip();
+          box.insertAdjacentHTML('beforeend',`<div class="applied">📷 ${t.aiImage}</div>`);}
+      });
+    }
+  }catch(e){
+    const noReach=/HTTP (401|403|0)|Failed to fetch|NetworkError|Load failed/i.test(e.message||'');
+    const msg=(!ANTH_KEY && !PROXY_URL && noReach)? t.aiNoKey : t.aiErr;
+    box.className='ai-result show';box.innerHTML=`<span class="err">${esc(msg)}</span>`;
+    try{box.scrollIntoView({behavior:'smooth',block:'center'})}catch(_){}
+  }
+}
+
+/* ============ INIT ============ */
+document.getElementById('currency').value=CUR;
+setLang(LANG);
+applyStatic();fillFilters();render();
+setSyncBadge(ghConfigured()?'ok':'off');
+if(ghConfigured()){ghPull(false);}
+</script>
+</body>
+</html>
