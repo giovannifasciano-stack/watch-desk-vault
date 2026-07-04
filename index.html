@@ -516,6 +516,7 @@ const I18N={
    setGh:"Database su GitHub (repo privato)",
    setGhNote:"I dati restano in locale e vengono sincronizzati su un <b>repo privato</b> GitHub che diventa il tuo archivio master, accessibile da ogni dispositivo e versionato. Usa un token <b>fine-grained</b> con permesso <b>Contents: Read &amp; Write</b> sul solo repo dell'archivio. Il token resta solo nel tuo browser.",
    ghToken:"GitHub token",ghOwner:"Owner (utente/org)",ghRepo:"Repository",ghPath:"Percorso file",ghBranch:"Branch",
+   paste:"Incolla",tokenHint:"Copia il token da GitHub, poi tocca Incolla. Deve iniziare con github_pat_",
    ghPull:"Carica da GitHub",ghPush:"Salva su GitHub",ghAuto:"Sincronizzazione automatica ad ogni modifica",
    setAi:"Stima prezzo AI",
    setProxyNote:"Metodo consigliato: incolla l'indirizzo del tuo <b>Cloudflare Worker</b>. La chiave Anthropic resta sul server, mai esposta nella pagina, e il prezzo si carica su tutti i dispositivi.",
@@ -579,6 +580,7 @@ const I18N={
    setGh:"Database on GitHub (private repo)",
    setGhNote:"Data stays local and syncs to a <b>private</b> GitHub repo that becomes your master archive — available on every device and versioned. Use a <b>fine-grained</b> token with <b>Contents: Read &amp; Write</b> on the archive repo only. The token stays in your browser.",
    ghToken:"GitHub token",ghOwner:"Owner (user/org)",ghRepo:"Repository",ghPath:"File path",ghBranch:"Branch",
+   paste:"Paste",tokenHint:"Copy the token from GitHub, then tap Paste. It must start with github_pat_",
    ghPull:"Load from GitHub",ghPush:"Save to GitHub",ghAuto:"Auto-sync on every change",
    setAi:"AI price estimate",
    setProxyNote:"Recommended: paste your <b>Cloudflare Worker</b> address. The Anthropic key stays on the server, never exposed in the page, and prices load on every device.",
@@ -1424,7 +1426,13 @@ function openSettings(){
       <div class="fieldset"><div class="legend">${t.setGh}</div>
         <div class="set-note">${t.setGhNote}</div>
         <div class="sync-state" style="margin-bottom:12px"><span class="d ${ghConfigured()?'ok':''}"></span><span id="set-state">${ghConfigured()?t.stOk:t.stOff}</span></div>
-        <div class="row full">${setField(t.ghToken,'token',GH.token,'password','github_pat_…')}</div>
+        <div class="row full"><div class="field"><label>${t.ghToken}</label>
+          <div style="display:flex;gap:8px">
+            <input id="set-token" type="text" value="${esc(GH.token||'')}" placeholder="github_pat_…" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" data-1p-ignore data-lpignore="true" style="flex:1;font-family:var(--mono);font-size:12px">
+            <button type="button" class="btn gold" style="flex:none" onclick="pasteToken()">${t.paste}</button>
+          </div>
+          <div class="hint">${t.tokenHint}</div>
+        </div></div>
         <div class="row">${setField(t.ghOwner,'owner',GH.owner,'text','giovannifasciano-stack')}${setField(t.ghRepo,'repo',GH.repo,'text','watch-archive-data')}</div>
         <div class="row">${setField(t.ghPath,'path',GH.path||'archive.json','text','archive.json')}${setField(t.ghBranch,'branch',GH.branch||'main','text','main')}</div>
         <div class="field" style="margin-top:4px"><label style="display:flex;align-items:center;gap:9px;text-transform:none;letter-spacing:0;font-size:13px;cursor:pointer">
@@ -1458,6 +1466,17 @@ function openSettings(){
   document.body.style.overflow='hidden';
 }
 function sv(id){const el=document.getElementById('set-'+id);return el?el.value.trim():''}
+async function pasteToken(){
+  const el=document.getElementById('set-token');if(!el)return;
+  try{
+    const txt=await navigator.clipboard.readText();
+    if(txt&&txt.trim()){el.value=txt.trim();toast(LANG==='it'?'Token incollato ✓':'Token pasted ✓','ok')}
+    else toast(LANG==='it'?'Appunti vuoti: copia prima il token da GitHub':'Clipboard empty: copy the token from GitHub first','err');
+  }catch(e){
+    el.focus();
+    toast(LANG==='it'?'Consenti l\u2019accesso agli appunti, oppure tieni premuto sul campo e Incolla':'Allow clipboard access, or long-press the field and Paste','err');
+  }
+}
 function saveSettings(action){
   GH={token:sv('token'),owner:sv('owner'),repo:sv('repo'),path:sv('path')||'archive.json',
       branch:sv('branch')||'main',auto:document.getElementById('set-auto').checked,sha:GH.sha};
